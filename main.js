@@ -8,6 +8,12 @@
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
 
+var Intervall_ID;
+
+
+//Reference to my own adapter
+var myAdapter;
+
 // Load your modules here, e.g.:
 // const fs = require("fs");
 
@@ -103,7 +109,7 @@ class Wasserwaechter extends utils.Adapter {
 		await this.setStateAsync("deviceIP", { val: this.config.device_network_ip, ack: true });
 		await this.setStateAsync("devicePort", { val: this.config.device_network_port, ack: true });
 		await this.setStateAsync("devicePollInterval", { val: this.config.device_poll_interval, ack: true });
-		
+
 		// You can also add a subscription for multiple states. The following line watches all states starting with "lights."
 		// this.subscribeStates("lights.*");
 		// Or, if you really must, you can also watch all states. Don't do this if you don't need to. Otherwise this will cause a lot of unnecessary load on the system:
@@ -129,6 +135,11 @@ class Wasserwaechter extends utils.Adapter {
 
 		result = await this.checkGroupAsync("admin", "admin");
 		this.log.info("check group user admin group admin: " + result);
+
+
+		Intervall_ID = setInterval(pollData, 30000);
+
+		myAdapter = this;
 	}
 
 	/**
@@ -211,3 +222,9 @@ if (require.main !== module) {
 	// otherwise start the instance directly
 	new Wasserwaechter();
 }
+
+function pollData(){
+	myAdapter.log.info("trigger erhalten");
+}
+
+
