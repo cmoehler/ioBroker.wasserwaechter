@@ -229,12 +229,13 @@ function pollData(){
 
 	// Spannung Stützbatterie
 	GetDeviceState("BAT");
+	// Gesamtwassermenge
+	GetDeviceState("VOL");
 }
 
 function GetDeviceState(CMD){
 	myAdapter.log.info("Kommando: " + CMD);
 	try {
-		myAdapter.log.info("Request String: = " + "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + CMD);
 		require("request")("http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + CMD, function (error, response, result) {
 			myAdapter.log.info("Command: " + CMD + " = " + result);
 			// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
