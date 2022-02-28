@@ -245,7 +245,8 @@ function pollData(){
 function GetDeviceState(CMD){
 	try {
 		require("request")("http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + CMD, function (error, response, result) {
-			return result;
+			myAdapter.log.info(result);
+		return result;
 			// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
 		}).on("error", function (e) {myAdapter.log.error(e);});
 	} catch (e) { myAdapter.log.error(e); }
