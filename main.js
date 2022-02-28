@@ -226,10 +226,20 @@ if (require.main !== module) {
 function pollData(){
 	myAdapter.log.info("trigger erhalten");
 
-	// Spannung Stützbatterie
-	setTimeout(GetDeviceState,1000,"BAT");
-	// Gesamtwassermenge
-	setTimeout(GetDeviceState,2000,"VOL");
+	const delayTime = 1000;
+	let counter = 0;
+	// Spannung Stützbatterie BAT
+	setTimeout(GetDeviceState,counter * delayTime,"BAT");
+	counter++;
+	// Gesamtwassermenge VOL
+	setTimeout(GetDeviceState,counter * delayTime,"VOL");
+	counter++;
+	// Altuelle Wasserentnahme AVO
+	setTimeout(GetDeviceState,counter * delayTime,"AVO");
+	counter++;
+	// Letztes gezapftes Volumen LTV
+	setTimeout(GetDeviceState,counter * delayTime,"LTV");
+	counter++;
 }
 
 function GetDeviceState(CMD){
