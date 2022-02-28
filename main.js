@@ -232,7 +232,7 @@ function pollData(){
 
 	// Spannung Stützbatterie
 	try {
-		require("request")("https://192.168.70.26:5333/safe-tec/get/BAT", function (error, response, result) {
+		require("request")("http://192.168.70.26:5333/safe-tec/get/BAT", function (error, response, result) {
 			myAdapter.log.info(result);
 			// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
 		}).on("error", function (e) {myAdapter.log.error(e);});
