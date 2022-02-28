@@ -232,13 +232,13 @@ function pollData(){
 	setTimeout(SaveBatteryVoltage,counter * delayTime);
 	counter++;
 	// Gesamtwassermenge VOL
-	setTimeout(myAdapter.log.info(GetDeviceState,counter * delayTime,"VOL"));
+	setTimeout(GetDeviceState,counter * delayTime,"VOL");
 	counter++;
 	// Altuelle Wasserentnahme AVO
-	setTimeout(myAdapter.log.info(GetDeviceState,counter * delayTime,"AVO"));
+	setTimeout(GetDeviceState,counter * delayTime,"AVO");
 	counter++;
 	// Letztes gezapftes Volumen LTV
-	setTimeout(myAdapter.log.info(GetDeviceState,counter * delayTime,"LTV"));
+	setTimeout(GetDeviceState,counter * delayTime,"LTV");
 	counter++;
 }
 
