@@ -227,22 +227,20 @@ if (require.main !== module) {
 function pollData(){
 	myAdapter.log.info("trigger erhalten");
 
-	let Wasserw_C3_A4chter_IP = '192.168.70.26';
-	let Wasserw_C3_A4chter_Port = '5333';
+	let Wasserw_C3_A4chter_IP = "192.168.70.26";
+	let Wasserw_C3_A4chter_Port = "5333";
   
         // Spannung Stützbatterie
         try {
-			require("request")((['http://',Wasserw_C3_A4chter_IP,':',Wasserw_C3_A4chter_Port,'/safe-tec/get/','BAT'].join('')), async function (error, response, result) {
+			require("request")((["http://" + Wasserw_C3_A4chter_IP, + ":" + Wasserw_C3_A4chter_Port + "/safe-tec/get/" + "BAT"].join("")), async function (error, response, result) {
 			  if (result != null) {
-			  let Temp_4 = jsonataExpression((function () { try {return JSON.parse(result);} catch(e) {return {};}})(),'getBAT');
-			  let spannung_st_C3_BCtzbatterie = parseFloat((await replace_komma_with_dot(Temp_4)));
 			  // setState("0_userdata.0.Haussteuerung.Wasserwächter.battery_voltage"/*battery_voltage*/, spannung_st_C3_BCtzbatterie, true);
-			  console.debug((['Aktuelle Spannung der Stützbatterie = ',('' + spannung_st_C3_BCtzbatterie),' Volt'].join('')));
+			  console.debug("Aktuelle Spannung der Stützbatterie = " + String(result) + " Volt");
 			} else {
-			  console.warn(('result = getBAT ' + String(result)));
+			  console.warn(("result = getBAT " + String(result)));
 			}
 			}).on("error", function (e) {console.error(e);});
-		  } 
+		} 
 		  catch (e) {
 			   console.error(e); }
   
