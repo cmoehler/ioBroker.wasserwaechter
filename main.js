@@ -38,6 +38,7 @@ class Wasserwaechter extends utils.Adapter {
 		// this.config:
 		this.log.info("config option1: " + this.config.option1);
 		this.log.info("config option2: " + this.config.option2);
+		this.log.info("Device Network Address: " + this.config.device_network_ip);
 
 		/*
 		For every state in the system there has to be also an object of type state

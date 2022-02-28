@@ -13,7 +13,7 @@
 
 ## wasserwaechter adapter for ioBroker
 
-meine Beschreibung	
+Dieser adapter fragt die API der Wasserwächter von SYR oder Poligonvatro ab	
 
 ## Developer manual
 This section is intended for the developer. It can be deleted later
