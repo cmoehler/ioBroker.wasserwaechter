@@ -136,8 +136,8 @@ class Wasserwaechter extends utils.Adapter {
 		result = await this.checkGroupAsync("admin", "admin");
 		this.log.info("check group user admin group admin: " + result);
 
-
-		Intervall_ID = setInterval(pollData, 30000);
+		// Timer für das Polling starten
+		Intervall_ID = setInterval(pollData, parseInt(this.config.device_poll_interval) * 1000);
 
 		myAdapter = this;
 	}
@@ -153,6 +153,7 @@ class Wasserwaechter extends utils.Adapter {
 			// clearTimeout(timeout2);
 			// ...
 			// clearInterval(interval1);
+			clearInterval(Intervall_ID);
 
 			callback();
 		} catch (e) {
@@ -225,6 +226,13 @@ if (require.main !== module) {
 
 function pollData(){
 	myAdapter.log.info("trigger erhalten");
+	var result;
+    try {
+        require("request")('https://api.e-control.at/sprit/1.0/search/gas-stations/by-address?latitude=48.138062&longitude=16.235994&fuelType=DIE&includeClosed=true', function (error, response, result) {
+          myAdapter.log.info(result);
+        //setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
+        }).on("error", function (e) {myAdapter.log.info(e);});
+    } catch (e) { myAdapter.log.info(e); }
+	myAdapter.log.info("request: " + 'https://api.e-control.at/sprit/1.0/search/gas-stations/by-address?latitude=48.138062&longitude=16.235994&fuelType=DIE&includeClosed=true');
 }
-
 
