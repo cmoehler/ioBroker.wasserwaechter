@@ -38,7 +38,8 @@ class Wasserwaechter extends utils.Adapter {
 		// this.config:
 		this.log.info("Device Network Address: " + this.config.device_network_ip);
 		this.log.info("Device Network Port: " + this.config.device_network_port);
-
+		this.log.info("Device Polling Intervall in seconds: " + this.config.device_poll_interval);
+		
 		/*
 		For every state in the system there has to be also an object of type state
 		Here a simple template for a boolean variable named "testVariable"
@@ -57,6 +58,29 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		await this.setObjectNotExistsAsync("devicePort", {
+			type: "state",
+			common: {
+				name: "devicePort",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+		await this.setObjectNotExistsAsync("devicePollInterval", {
+			type: "state",
+			common: {
+				name: "devicePollInterval",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
 		
 		await this.setObjectNotExistsAsync("testVariable", {
 			type: "state",
@@ -73,7 +97,13 @@ class Wasserwaechter extends utils.Adapter {
 		// In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
 		this.subscribeStates("testVariable");
 		this.subscribeStates("deviceIP");
+		this.subscribeStates("devicePort");
+		this.subscribeStates("devicePollInterval");
+
 		await this.setStateAsync("deviceIP", { val: this.config.device_network_ip, ack: true });
+		await this.setStateAsync("devicePort", { val: this.config.device_network_port, ack: true });
+		await this.setStateAsync("devicePollInterval", { val: this.config.device_poll_interval, ack: true });
+		
 		// You can also add a subscription for multiple states. The following line watches all states starting with "lights."
 		// this.subscribeStates("lights.*");
 		// Or, if you really must, you can also watch all states. Don't do this if you don't need to. Otherwise this will cause a lot of unnecessary load on the system:

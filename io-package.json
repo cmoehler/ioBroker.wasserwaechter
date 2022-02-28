@@ -72,7 +72,8 @@
 	},
 	"native": {
 		"device_network_ip": "0.0.0.0",
-		"device_network_port": "5333"
+		"device_network_port": "5333",
+		"device_poll_interval": "30"
 	},
 	"objects": [],
 	"instanceObjects": []
