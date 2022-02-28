@@ -231,26 +231,13 @@ function pollData(){
 	let Wasserw_C3_A4chter_Port = "5333";
   
         // Spannung Stützbatterie
-        try {
-			require("request")((["http://" + Wasserw_C3_A4chter_IP, + ":" + Wasserw_C3_A4chter_Port + "/safe-tec/get/" + "BAT"].join("")), async function (error, response, result) {
-			  if (result != null) {
-			  // setState("0_userdata.0.Haussteuerung.Wasserwächter.battery_voltage"/*battery_voltage*/, spannung_st_C3_BCtzbatterie, true);
-			  console.debug("Aktuelle Spannung der Stützbatterie = " + String(result) + " Volt");
-			} else {
-			  console.warn(("result = getBAT " + String(result)));
-			}
-			}).on("error", function (e) {console.error(e);});
-		} 
-		  catch (e) {
-			   console.error(e); }
   
 
-//	try {
-//			require("request")('https://api.e-control.at/sprit/1.0/search/gas-stations/by-address?latitude=48.138062&longitude=16.235994&fuelType=DIE&includeClosed=true', function (error, response, result) {
-//          myAdapter.log.info(result);
-//        //setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
-//        }).on("error", function (e) {myAdapter.log.info(e);});
-//    } catch (e) { myAdapter.log.info(e); }
-//	myAdapter.log.info("request: " + 'https://api.e-control.at/sprit/1.0/search/gas-stations/by-address?latitude=48.138062&longitude=16.235994&fuelType=DIE&includeClosed=true');
+	try {
+		require("request")('https://192.168.70.26:5333/safe-tec/get/BAT'), function (error, response, result) {
+        myAdapter.log.info(result);
+        //setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
+        }).on("error", function (e) {myAdapter.log.error(e);});
+    } catch (e) { myAdapter.log.error(e); }
 
 }
