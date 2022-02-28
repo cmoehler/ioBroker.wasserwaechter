@@ -231,10 +231,12 @@ function pollData(){
 	GetDeviceState("BAT");
 }
 
-function GetDeviceState(Command){
+function GetDeviceState(CMD){
+	myAdapter.log.info("Kommando: " + CMD)
 	try {
-		require("request")("http://" + myAdapter.deviceIP + ":" + myAdapter.devicePort + "/safe-tec/get/" + Command, function (error, response, result) {
-			myAdapter.log.info("Command: " + Command + " = " + result);
+		myAdapter.log.info("Request String: =" + "http://" + myAdapter.deviceIP + ":" + myAdapter.devicePort + "/safe-tec/get/" + CMD);
+		require("request")("http://" + myAdapter.deviceIP + ":" + myAdapter.devicePort + "/safe-tec/get/" + CMD, function (error, response, result) {
+			myAdapter.log.info("Command: " + CMD + " = " + result);
 			// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
 		}).on("error", function (e) {myAdapter.log.error(e);});
 	} catch (e) { myAdapter.log.error(e); }
