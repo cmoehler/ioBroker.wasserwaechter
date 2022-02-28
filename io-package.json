@@ -1,0 +1,79 @@
+{
+	"common": {
+		"name": "wasserwaechter",
+		"version": "0.0.1",
+		"news": {
+			"0.0.1": {
+				"en": "initial release",
+				"de": "Erstveröffentlichung",
+				"ru": "Начальная версия",
+				"pt": "lançamento inicial",
+				"nl": "Eerste uitgave",
+				"fr": "Première version",
+				"it": "Versione iniziale",
+				"es": "Versión inicial",
+				"pl": "Pierwsze wydanie",
+				"zh-cn": "首次出版"
+			}
+		},
+		"title": "Wasserwächter",
+		"titleLang": {
+			"en": "Wasserwächter",
+			"de": "Wasserwächter",
+			"ru": "Wasserwächter",
+			"pt": "Wasserwächter",
+			"nl": "Wasserwächter",
+			"fr": "Wasserwächter",
+			"it": "Wasserwächter",
+			"es": "Wasserwächter",
+			"pl": "Wasserwächter",
+			"zh-cn": "Wasserwächter"
+		},
+		"desc": {
+			"en": "wasserwaechter",
+			"de": "wasserwaechter",
+			"ru": "wasserwaechter",
+			"pt": "wasserwaechter",
+			"nl": "wasserwaechter",
+			"fr": "wasserwaechter",
+			"it": "wasserwaechter",
+			"es": "wasserwaechter",
+			"pl": "wasserwaechter",
+			"zh-cn": "wasserwaechter"
+		},
+		"authors": [
+			"cmoehler <ccm@gmx.net>"
+		],
+		"keywords": [
+			"ioBroker",
+			"template",
+			"Smart Home",
+			"home automation"
+		],
+		"license": "MIT",
+		"platform": "Javascript/Node.js",
+		"main": "main.js",
+		"icon": "wasserwaechter.png",
+		"enabled": true,
+		"extIcon": "https://raw.githubusercontent.com/cmoehler/ioBroker.wasserwaechter/main/admin/wasserwaechter.png",
+		"readme": "https://github.com/cmoehler/ioBroker.wasserwaechter/blob/main/README.md",
+		"loglevel": "info",
+		"mode": "daemon",
+		"type": "iot-systems",
+		"compact": true,
+		"connectionType": "local",
+		"dataSource": "poll",
+		"materialize": true,
+		"dependencies": [
+			{
+				"js-controller": ">=2.0.0"
+			}
+		]
+	},
+	"native": {
+		"option1": true,
+		"option2": "42"
+	},
+	"objects": [],
+	"instanceObjects": []
+}
