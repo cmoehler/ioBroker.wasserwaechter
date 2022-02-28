@@ -13,7 +13,7 @@
 
 ## wasserwaechter adapter for ioBroker
 
-Describe your project here
+meine Beschreibung	
 
 ## Developer manual
 This section is intended for the developer. It can be deleted later
