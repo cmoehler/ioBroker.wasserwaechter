@@ -229,31 +229,30 @@ function pollData(){
 	const delayTime = 1000;
 	let counter = 0;
 	// Spannung Stützbatterie BAT
-	SaveBatteryVoltage(setTimeout(GetDeviceState,counter * delayTime,"BAT"));
+	setTimeout(SaveBatteryVoltage,counter * delayTime);
 	counter++;
 	// Gesamtwassermenge VOL
-	setTimeout(GetDeviceState,counter * delayTime,"VOL");
+	setTimeout(myAdapter.log.info(GetDeviceState,counter * delayTime,"VOL"));
 	counter++;
 	// Altuelle Wasserentnahme AVO
-	setTimeout(GetDeviceState,counter * delayTime,"AVO");
+	setTimeout(myAdapter.log.info(GetDeviceState,counter * delayTime,"AVO"));
 	counter++;
 	// Letztes gezapftes Volumen LTV
-	setTimeout(GetDeviceState,counter * delayTime,"LTV");
+	setTimeout(myAdapter.log.info(GetDeviceState,counter * delayTime,"LTV"));
 	counter++;
 }
 
 function GetDeviceState(CMD){
-	myAdapter.log.info("Kommando: " + CMD);
 	try {
 		require("request")("http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + CMD, function (error, response, result) {
-			myAdapter.log.info("Command: " + CMD + " = " + result);
 			return result;
 			// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
 		}).on("error", function (e) {myAdapter.log.error(e);});
 	} catch (e) { myAdapter.log.error(e); }
 }
 
-function SaveBatteryVoltage(ReturnResult)
+function SaveBatteryVoltage()
 {
-	myAdapter.log.info("SaveBattery Funktion: Parameter = " + ReturnResult);
+	let Batteriespannung = GetDeviceState("BAT");
+	myAdapter.log.info("Batterriespannung = " + Batteriespannung);
 }
