@@ -231,14 +231,12 @@ function pollData(){
 	let Wasserw_C3_A4chter_Port = "5333";
   
         // Spannung Stützbatterie
-  
-
-	try {
-		require("request")("https://192.168.70.26:5333/safe-tec/get/BAT"), function (error, response, result) 
-		{
-        	myAdapter.log.info(result);
-        
-        };
-    } catch (e) { myAdapter.log.error(e); }
-
+		try {
+			require("request")("https://api.e-control.at/sprit/1.0/search/gas-stations/by-address?latitude=48.138062&longitude=16.235994&fuelType=DIE&includeClosed=true", function (error, response, result) {
+				myAdapter.log.info(result);
+			// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
+			}).on("error", function (e) {myAdapter.log.error(e);});
+		} catch (e) { myAdapter.log.error(e); }
+	  //console.debug("request: " + "https://api.e-control.at/sprit/1.0/search/gas-stations/by-address?latitude=48.138062&longitude=16.235994&fuelType=DIE&includeClosed=true");
+	
 }
