@@ -8,11 +8,10 @@
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
 
-var Intervall_ID;
-
+let Intervall_ID;
 
 //Reference to my own adapter
-var myAdapter;
+let myAdapter;
 
 // Load your modules here, e.g.:
 // const fs = require("fs");
@@ -45,7 +44,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.log.info("Device Network Address: " + this.config.device_network_ip);
 		this.log.info("Device Network Port: " + this.config.device_network_port);
 		this.log.info("Device Polling Intervall in seconds: " + this.config.device_poll_interval);
-		
+
 		/*
 		For every state in the system there has to be also an object of type state
 		Here a simple template for a boolean variable named "testVariable"
@@ -228,9 +227,9 @@ function pollData(){
 	myAdapter.log.info("trigger erhalten");
 
 	// Spannung Stützbatterie
-	GetDeviceState("BAT");
+	setTimeout(GetDeviceState,1000,"BAT");
 	// Gesamtwassermenge
-	GetDeviceState("VOL");
+	setTimeout(GetDeviceState,2000,"VOL");
 }
 
 function GetDeviceState(CMD){
