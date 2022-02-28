@@ -234,8 +234,8 @@ function pollData(){
 function GetDeviceState(CMD){
 	myAdapter.log.info("Kommando: " + CMD);
 	try {
-		myAdapter.log.info("Request String: =" + "http://" + myAdapter.deviceIP + ":" + myAdapter.devicePort + "/safe-tec/get/" + CMD);
-		require("request")("http://" + myAdapter.deviceIP + ":" + myAdapter.devicePort + "/safe-tec/get/" + CMD, function (error, response, result) {
+		myAdapter.log.info("Request String: = " + "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + CMD);
+		require("request")("http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + CMD, function (error, response, result) {
 			myAdapter.log.info("Command: " + CMD + " = " + result);
 			// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
 		}).on("error", function (e) {myAdapter.log.error(e);});
