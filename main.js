@@ -37,6 +37,7 @@ class Wasserwaechter extends utils.Adapter {
 		// The adapters config (in the instance object everything under the attribute "native") is accessible via
 		// this.config:
 		this.log.info("Device Network Address: " + this.config.device_network_ip);
+		this.log.info("Device Network Port: " + this.config.device_network_port);
 
 		/*
 		For every state in the system there has to be also an object of type state
