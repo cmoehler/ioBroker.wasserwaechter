@@ -231,9 +231,7 @@ if (require.main !== module) {
 
 
 function prepareGetRequest(command){
-	const requeststring = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + command;
-	myAdapter.log.info("Request String: " + requeststring);
-	return requeststring;
+	return "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + command;
 }
 
 function pollData(){
@@ -251,9 +249,7 @@ function pollData(){
 
 function getBatterieVoltage(){
 	// Spannung Stützbatterie BAT
-	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
-
-	axios.get(url + "BAT")
+	axios.get(prepareGetRequest("BAT"))
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Batteriespannung = " + response.data.getBAT + " Volt");
@@ -265,9 +261,7 @@ function getBatterieVoltage(){
 
 function currentWaterVolume(){
 	// Aktuelle Wasserentnahme AVO
-	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
-
-	axios.get(url + "AVO")
+	axios.get(prepareGetRequest("AVO"))
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Aktuelle Wasserentnahme = " + response.data.getAVO + " Liter");
@@ -279,9 +273,7 @@ function currentWaterVolume(){
 
 function getLastWaterVolume(){
 	// Letztes gezapftes Volumen LTV
-	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
-
-	axios.get(url + "LTV")
+	axios.get(prepareGetRequest("LTV"))
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Letztes gezapftes Volumen = " + response.data.getLTV + " Liter");
