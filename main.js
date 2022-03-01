@@ -234,22 +234,25 @@ function pollData(){
 	// BAT VOL AVO LTV
 	// Spannung Stützbatterie BAT
 	//setTimeout(GetDeviceState,counter * delayTime, "BAT");}
+	if(false){
+		let requestBatterieVoltage = require("request");
 
-	let requestBatterieVoltage = require("request");
-
-	myAdapter.log.info(requestBatterieVoltage(reqstring).on("response", function(response) {
-		myAdapter.log.info(response.statusCode);	// 200
-		myAdapter.log.info(response.headers["content-type"]);
-	}));
+		myAdapter.log.info(requestBatterieVoltage(reqstring).on("response", function(response) {
+			myAdapter.log.info(response.statusCode);	// 200
+			myAdapter.log.info(response.headers["content-type"]);
+		}));
+	}
 	const axios = require("axios");
 	const url = "http://192.168.70.26:5333/safe-tec/get/BAT";
 
 	axios.get(url)
-	.then(function(response){
-		myAdapter.log.info(response.data);
-	});
+		.then(function(response){
+			myAdapter.log.info(response);
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
 }
-  	
 
 function GetDeviceState(CMD){
 	let answer;
