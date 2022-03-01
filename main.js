@@ -56,6 +56,19 @@ class Wasserwaechter extends utils.Adapter {
 		Here a simple template for a boolean variable named "testVariable"
 		Because every adapter instance uses its own unique namespace variable names can't collide with other adapters variables
 		*/
+		await this.setObjectNotExistsAsync("Device.deviceIP", {
+			type: "state",
+			common: {
+				name: "deviceIP",
+				type: "string",
+				role: "indicator",
+				unit: "IPv4",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 
 		await this.setObjectNotExistsAsync("deviceIP", {
 			type: "state",
@@ -63,6 +76,7 @@ class Wasserwaechter extends utils.Adapter {
 				name: "deviceIP",
 				type: "string",
 				role: "indicator",
+				unit: "IPv4",
 				read: true,
 				write: true,
 			},
@@ -75,6 +89,7 @@ class Wasserwaechter extends utils.Adapter {
 				name: "devicePort", 
 				type: "string",
 				role: "indicator",
+				unit: "Port",
 				read: true,
 				write: true,
 			},
