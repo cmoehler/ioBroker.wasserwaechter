@@ -246,6 +246,7 @@ function pollData(){
 		}));
 	}
 
+	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
 
 	axios.get(url + "BAT")
 		.then(function(response){
