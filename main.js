@@ -7,7 +7,9 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
+const { rejects } = require("assert");
 const { request } = require("http");
+const { resolve } = require("path");
 const { resourceLimits } = require("worker_threads");
 
 let Intervall_ID;
@@ -225,14 +227,40 @@ if (require.main !== module) {
 	new Wasserwaechter();
 }
 
+const getDeviceBatteryVoltage = new Promise((resolve,reject) => {
+
+	try {
+		require("request")(prepareGetRequest("BAT"), function (error, response, result) {
+		//request(prepareGetRequest(CMD), function (error, response, result) {
+			if (result != null) {
+				myAdapter.log.info(result);
+				// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
+				resolve(result);
+			}
+			else{
+				reject("Error HTTP Request -> BAT");
+			}
+		}).on("error", function (e) {reject("try " + e);});}
+	catch (e) {
+		reject("catch " + e);
+	}
+});
+
+
 function pollData(){
 	myAdapter.log.info("trigger erhalten");
 
-	const delayTime = 1000;
-	let counter = 0;
-	// Spannung Stützbatterie BAT
-	setTimeout(GetDeviceState,counter * delayTime, "BAT");
+	getDeviceBatteryVoltage.then((ergebnis) => {
+		myAdapter.log.info(ergebnis);
+	}).catch((ergebnis) => {
+		myAdapter.log.info(ergebnis);
+	});
+
 	if(false){
+		const delayTime = 1000;
+		let counter = 0;
+		// Spannung Stützbatterie BAT
+		setTimeout(GetDeviceState,counter * delayTime, "BAT");
 		counter++;
 		// Gesamtwassermenge VOL
 		setTimeout(GetDeviceState,counter * delayTime,"VOL");
@@ -260,7 +288,7 @@ function GetDeviceState(CMD){
 			// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
 			}
 			else{
-				myAdapter.log.error("Error HTTP Request");
+				myAdapter.log.error("Error HTTP Request -> State: " + CMD);
 			}
 		}).on("error", function (e) {myAdapter.log.error("try " + e);});}
 	catch (e) {
@@ -275,8 +303,3 @@ function prepareGetRequest(command){
 	return requeststring;
 }
 
-function SaveBatteryVoltage()
-{
-	const Batteriespannung = GetDeviceState("BAT");
-	myAdapter.log.info("Batterriespannung = " + Batteriespannung);
-}
