@@ -232,16 +232,18 @@ function pollData(){
 	let counter = 0;
 	// Spannung Stützbatterie BAT
 	setTimeout(SaveBatteryVoltage,counter * delayTime);
-	counter++;
-	// Gesamtwassermenge VOL
-	setTimeout(GetDeviceState,counter * delayTime,"VOL");
-	counter++;
-	// Altuelle Wasserentnahme AVO
-	setTimeout(GetDeviceState,counter * delayTime,"AVO");
-	counter++;
-	// Letztes gezapftes Volumen LTV
-	setTimeout(GetDeviceState,counter * delayTime,"LTV");
-	counter++;
+	if(false){
+		counter++;
+		// Gesamtwassermenge VOL
+		setTimeout(GetDeviceState,counter * delayTime,"VOL");
+		counter++;
+		// Altuelle Wasserentnahme AVO
+		setTimeout(GetDeviceState,counter * delayTime,"AVO");
+		counter++;
+		// Letztes gezapftes Volumen LTV
+		setTimeout(GetDeviceState,counter * delayTime,"LTV");
+		counter++;
+	}
 }
 
 
@@ -267,11 +269,13 @@ function GetDeviceState(CMD){
 }
 
 function prepareGetRequest(command){
-	return "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + command;
+	const requeststring = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + command;
+	myAdapter.log.info("Request String: " + requeststring);
+	return requeststring;
 }
 
 function SaveBatteryVoltage()
 {
-	let Batteriespannung = GetDeviceState("BAT");
+	const Batteriespannung = GetDeviceState("BAT");
 	myAdapter.log.info("Batterriespannung = " + Batteriespannung);
 }
