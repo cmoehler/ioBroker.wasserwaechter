@@ -234,8 +234,13 @@ function pollData(){
 	// BAT VOL AVO LTV
 	// Spannung Stützbatterie BAT
 	//setTimeout(GetDeviceState,counter * delayTime, "BAT");}
-	let requestBatterieVoltage = require('request');
-	myAdapter.log.info(requestBatterieVoltage(reqstring));
+
+	let requestBatterieVoltage = require("request");
+
+	myAdapter.log.info(requestBatterieVoltage(reqstring).on("response", function(response) {
+		myAdapter.log.info(response.statusCode);	// 200
+		myAdapter.log.info(response.headers["content-type"]);
+	}));
 }
 
 function GetDeviceState(CMD){
