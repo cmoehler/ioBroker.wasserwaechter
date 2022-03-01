@@ -232,7 +232,7 @@ const getDeviceBatteryVoltage = new Promise((resolve,reject) => {
 	if (result != null) {
 		resolve(result);
 	}else{
-		reject("Error HTTP Request -> BAT");
+		reject(result);
 	}
 });
 
