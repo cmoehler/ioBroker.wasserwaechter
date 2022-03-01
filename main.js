@@ -227,9 +227,9 @@ if (require.main !== module) {
 	new Wasserwaechter();
 }
 
-const getDeviceBatteryVoltage = new Promise((resolve,reject) => {
-	let result = null;
-	if (result != null) {
+const getDeviceBatteryVoltage = new Promise((resolve, reject) => {
+	let result = "Alles OK";
+	if (result != "Alles OK") {
 		resolve(result);
 	}else{
 		reject(result);
@@ -238,6 +238,7 @@ const getDeviceBatteryVoltage = new Promise((resolve,reject) => {
 
 
 function pollData(){
+
 	myAdapter.log.info("trigger erhalten");
 
 	if(false){
@@ -263,8 +264,6 @@ function pollData(){
 		});
 	}
 }
-
-
 
 function GetDeviceState(CMD){
 	let answer;
