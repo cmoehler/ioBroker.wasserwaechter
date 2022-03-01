@@ -227,6 +227,10 @@ if (require.main !== module) {
 	new Wasserwaechter();
 }
 
+function delay(time) {
+	return new Promise(resolve => setTimeout(resolve, time));
+}
+
 function pollData(){
 
 	myAdapter.log.info("trigger erhalten");
@@ -246,7 +250,6 @@ function pollData(){
 	const axios = require("axios");
 	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
 
-	if(false){
 	axios.get(url + "BAT")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
@@ -255,6 +258,8 @@ function pollData(){
 		.catch(function(error){
 			myAdapter.log.error(error);
 		});
+
+	delay(1000).then(() => myAdapter.log.info("1 Sekunde vorbei"));
 
 	axios.get(url + "LTV")
 		.then(function(response){
@@ -265,6 +270,8 @@ function pollData(){
 			myAdapter.log.error(error);
 		});
 
+	delay(1000).then(() => myAdapter.log.info("1 Sekunde vorbei"));
+
 	axios.get(url + "AVO")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
@@ -273,7 +280,9 @@ function pollData(){
 		.catch(function(error){
 			myAdapter.log.error(error);
 		});
-	}
+
+	delay(1000).then(() => myAdapter.log.info("1 Sekunde vorbei"));
+
 	axios.get(url + "VOL")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
