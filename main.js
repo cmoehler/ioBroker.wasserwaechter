@@ -246,6 +246,7 @@ function pollData(){
 	const axios = require("axios");
 	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
 
+	if(false){
 	axios.get(url + "BAT")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
@@ -272,7 +273,7 @@ function pollData(){
 		.catch(function(error){
 			myAdapter.log.error(error);
 		});
-
+	}
 	axios.get(url + "VOL")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
