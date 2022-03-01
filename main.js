@@ -244,17 +244,20 @@ function pollData(){
 	counter++;
 }
 
+
+
 function GetDeviceState(CMD){
-	let ergeb;
+
+	// Spannung Stützbatterie
 	try {
 		request("http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + CMD, function (error, response, result) {
-			ergeb = result;
-			myAdapter.log.info(result);
+			if (result != null) {
+				myAdapter.log.info(result);
 			// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
+			}
 		}).on("error", function (e) {myAdapter.log.error(e);});}
 	catch (e) {
 		myAdapter.log.error(e); }
-	return ergeb;
 }
 
 function SaveBatteryVoltage()
