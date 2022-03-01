@@ -276,7 +276,7 @@ function pollData(){
 	axios.get(url + "VOL")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
-			myAdapter.log.info("Gesamtwasserverbrauch = " + response.data.getVOL + " Liter");
+			//myAdapter.log.info("Gesamtwasserverbrauch = " + response.data.getVOL + " Liter");
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
