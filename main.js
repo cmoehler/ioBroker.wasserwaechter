@@ -242,12 +242,15 @@ function pollData(){
 			myAdapter.log.info(response.headers["content-type"]);
 		}));
 	}
+	
 	const axios = require("axios");
-	const url = "http://192.168.70.26:5333/safe-tec/get/BAT";
+	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
 
-	axios.get(url)
+	axios.get(url + "BAT")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
+			const obj = JSON.parse(response.data);
+			myAdapter.log.info("Batteriespannung = " + obj.getBAT + "Volt");
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
