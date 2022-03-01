@@ -228,7 +228,7 @@ if (require.main !== module) {
 }
 
 const getDeviceBatteryVoltage = new Promise((resolve,reject) => {
-	let result = "alles OK";
+	let result = null;
 	if (result != null) {
 		resolve(result);
 	}else{
