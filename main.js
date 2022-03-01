@@ -267,7 +267,16 @@ function pollData(){
 	axios.get(url + "AVO")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
-			myAdapter.log.info("Gesamtwasserverbrauch = " + response.data.getAVO + " Liter");
+			myAdapter.log.info("Aktuelle Wasserentnahme = " + response.data.getAVO + " Liter");
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+
+	axios.get(url + "VOL")
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Gesamtwasserverbrauch = " + response.data.getVOL + " Liter");
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
