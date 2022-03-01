@@ -247,7 +247,7 @@ function pollData(){
 
 	axios.get(url)
 		.then(function(response){
-			myAdapter.log.info(JSON.stringify(response));
+			myAdapter.log.info(JSON.stringify(response.data));
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
