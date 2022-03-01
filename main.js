@@ -7,6 +7,8 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
+const { request } = require("http");
+const { resourceLimits } = require("worker_threads");
 
 let Intervall_ID;
 
@@ -243,13 +245,16 @@ function pollData(){
 }
 
 function GetDeviceState(CMD){
+	let ergeb;
 	try {
-		require("request")("http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + CMD, function (error, response, result) {
+		request("http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + CMD, function (error, response, result) {
+			ergeb = result;
 			myAdapter.log.info(result);
-		return result;
 			// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
-		}).on("error", function (e) {myAdapter.log.error(e);});
-	} catch (e) { myAdapter.log.error(e); }
+		}).on("error", function (e) {myAdapter.log.error(e);});}
+	catch (e) {
+		myAdapter.log.error(e); }
+	return ergeb;
 }
 
 function SaveBatteryVoltage()
