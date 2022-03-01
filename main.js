@@ -227,42 +227,15 @@ if (require.main !== module) {
 	new Wasserwaechter();
 }
 
-const getDeviceBatteryVoltage = new Promise((resolve, reject) => {
-	let result = "Alles OK";
-	if (result != "Alles OK") {
-		resolve(result);
-	}else{
-		reject(result);
-	}
-});
-
-
 function pollData(){
 
 	myAdapter.log.info("trigger erhalten");
-
-	if(false){
-		const delayTime = 1000;
-		let counter = 0;
-		// Spannung Stützbatterie BAT
-		setTimeout(GetDeviceState,counter * delayTime, "BAT");
-		counter++;
-		// Gesamtwassermenge VOL
-		setTimeout(GetDeviceState,counter * delayTime,"VOL");
-		counter++;
-		// Altuelle Wasserentnahme AVO
-		setTimeout(GetDeviceState,counter * delayTime,"AVO");
-		counter++;
-		// Letztes gezapftes Volumen LTV
-		setTimeout(GetDeviceState,counter * delayTime,"LTV");
-		counter++;
-	}else{
-		getDeviceBatteryVoltage.then((ergebnis) => {
-			myAdapter.log.info(ergebnis);
-		}).catch((ergebnis) => {
-			myAdapter.log.info(ergebnis);
-		});
-	}
+	const reqstring = "http://192.168.70.26:5333/safe-tec/get/BAT";
+	// BAT VOL AVO LTV
+	// Spannung Stützbatterie BAT
+	//setTimeout(GetDeviceState,counter * delayTime, "BAT");}
+	let requestBatterieVoltage = require('request');
+	myAdapter.log.info(requestBatterieVoltage(reqstring));
 }
 
 function GetDeviceState(CMD){
