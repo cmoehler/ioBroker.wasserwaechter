@@ -228,33 +228,17 @@ if (require.main !== module) {
 }
 
 const getDeviceBatteryVoltage = new Promise((resolve,reject) => {
-
-	try {
-		require("request")(prepareGetRequest("BAT"), function (error, response, result) {
-		//request(prepareGetRequest(CMD), function (error, response, result) {
-			if (result != null) {
-				myAdapter.log.info(result);
-				// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
-				resolve(result);
-			}
-			else{
-				reject("Error HTTP Request -> BAT");
-			}
-		}).on("error", function (e) {reject("try " + e);});}
-	catch (e) {
-		reject("catch " + e);
+	let result = "alles OK";
+	if (result != null) {
+		resolve(result);
+	}else{
+		reject("Error HTTP Request -> BAT");
 	}
 });
 
 
 function pollData(){
 	myAdapter.log.info("trigger erhalten");
-
-	getDeviceBatteryVoltage.then((ergebnis) => {
-		myAdapter.log.info(ergebnis);
-	}).catch((ergebnis) => {
-		myAdapter.log.info(ergebnis);
-	});
 
 	if(false){
 		const delayTime = 1000;
@@ -271,6 +255,12 @@ function pollData(){
 		// Letztes gezapftes Volumen LTV
 		setTimeout(GetDeviceState,counter * delayTime,"LTV");
 		counter++;
+	}else{
+		getDeviceBatteryVoltage.then((ergebnis) => {
+			myAdapter.log.info(ergebnis);
+		}).catch((ergebnis) => {
+			myAdapter.log.info(ergebnis);
+		});
 	}
 }
 
