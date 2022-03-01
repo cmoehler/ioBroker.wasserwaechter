@@ -57,10 +57,10 @@ class Wasserwaechter extends utils.Adapter {
 		Because every adapter instance uses its own unique namespace variable names can't collide with other adapters variables
 		*/
 
-		await this.setObjectNotExistsAsync("Device.deviceIP", {
+		await this.setObjectNotExistsAsync("Device.IP", {
 			type: "state",
 			common: {
-				name: "deviceIP",
+				name: "Device IP Address",
 				type: "string",
 				role: "indicator",
 				unit: "IPv4",
@@ -70,10 +70,10 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		await this.setObjectNotExistsAsync("Device.devicePort", {
+		await this.setObjectNotExistsAsync("Device.Port", {
 			type: "state",
 			common: {
-				name: "devicePort",
+				name: "Device API Port",
 				type: "string",
 				role: "indicator",
 				unit: "Port",
@@ -83,10 +83,10 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		await this.setObjectNotExistsAsync("Device.devicePollInterval", {
+		await this.setObjectNotExistsAsync("Device.PollingInterval", {
 			type: "state",
 			common: {
-				name: "devicePollInterval",
+				name: "Device Polling Interval",
 				type: "string",
 				role: "indicator",
 				unit: "s",
@@ -110,13 +110,13 @@ class Wasserwaechter extends utils.Adapter {
 
 		// In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
 		this.subscribeStates("testVariable");
-		this.subscribeStates("deviceIP");
-		this.subscribeStates("devicePort");
-		this.subscribeStates("devicePollInterval");
+		this.subscribeStates("Device.IP");
+		this.subscribeStates("Device.Port");
+		this.subscribeStates("Device.PollingInterval");
 
-		await this.setStateAsync("Device.deviceIP", { val: this.config.device_network_ip, ack: true });
-		await this.setStateAsync("Device.devicePort", { val: this.config.device_network_port, ack: true });
-		await this.setStateAsync("Device.devicePollInterval", { val: this.config.device_poll_interval, ack: true });
+		await this.setStateAsync("Device.IP", { val: this.config.device_network_ip, ack: true });
+		await this.setStateAsync("Device.Port", { val: this.config.device_network_port, ack: true });
+		await this.setStateAsync("Device.PollingInterval", { val: this.config.device_poll_interval, ack: true });
 
 		// You can also add a subscription for multiple states. The following line watches all states starting with "lights."
 		// this.subscribeStates("lights.*");
