@@ -241,7 +241,6 @@ function pollData(){
 		myAdapter.log.info(response.statusCode);	// 200
 		myAdapter.log.info(response.headers["content-type"]);
 	}));
-
 	const axios = require("axios");
 	const url = "http://192.168.70.26:5333/safe-tec/get/BAT";
 
@@ -249,6 +248,7 @@ function pollData(){
 	.then(function(response){
 		myAdapter.log.info(response.data);
 	});
+}
   	
 
 function GetDeviceState(CMD){
@@ -277,4 +277,3 @@ function prepareGetRequest(command){
 	myAdapter.log.info("Request String: " + requeststring);
 	return requeststring;
 }
-
