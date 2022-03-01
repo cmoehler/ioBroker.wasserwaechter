@@ -57,6 +57,7 @@ class Wasserwaechter extends utils.Adapter {
 		Because every adapter instance uses its own unique namespace variable names can't collide with other adapters variables
 		*/
 
+		// Device States
 		await this.setObjectNotExistsAsync("Device.IP", {
 			type: "state",
 			common: {
@@ -107,6 +108,24 @@ class Wasserwaechter extends utils.Adapter {
 			},
 			native: {},
 		});
+
+		await this.setObjectNotExistsAsync("Device.BatteryVoltage", {
+			type: "state",
+			common: {
+				name: "Device Battery Voltage",
+				type: "number",
+				role: "indicator",
+				unit: "V",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+		// Condition States
+
+
+
 
 		// In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
 		this.subscribeStates("testVariable");
@@ -259,6 +278,8 @@ function getBatterieVoltage(){
 			const btv = parseFloat(String(response.data.getBAT).replace(",",".")).toFixed(1);
 			myAdapter.log.info("Batteriespannung = " + response.data.getBAT + " Volt");
 			myAdapter.log.info("Batteriespannung = " + String(btv) + " Volt (Zahl)");
+			myAdapter.setStateAsync("Device.BatteryVoltage", { val: btv, ack: true });
+
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
