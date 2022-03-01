@@ -244,7 +244,8 @@ function pollData(){
 	}
 	const axios = require("axios");
 	const url = "http://192.168.70.26:5333/safe-tec/get/BAT";
-url)
+
+	axios.get(url)
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response));
 		})
