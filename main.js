@@ -242,7 +242,7 @@ function pollData(){
 			myAdapter.log.info(response.headers["content-type"]);
 		}));
 	}
-	
+
 	const axios = require("axios");
 	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
 
@@ -255,10 +255,19 @@ function pollData(){
 			myAdapter.log.error(error);
 		});
 
-		axios.get(url + "LTV")
+	axios.get(url + "LTV")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Letztes gezapftes Volumen = " + response.data.getLTV + " Liter");
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+
+	axios.get(url + "AVO")
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Gesamtwasserverbrauch = " + response.data.getAVO + " Liter");
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
