@@ -56,6 +56,7 @@ class Wasserwaechter extends utils.Adapter {
 		Here a simple template for a boolean variable named "testVariable"
 		Because every adapter instance uses its own unique namespace variable names can't collide with other adapters variables
 		*/
+
 		await this.setObjectNotExistsAsync("Device.deviceIP", {
 			type: "state",
 			common: {
@@ -69,24 +70,10 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-
-		await this.setObjectNotExistsAsync("deviceIP", {
+		await this.setObjectNotExistsAsync("Device.devicePort", {
 			type: "state",
 			common: {
-				name: "deviceIP",
-				type: "string",
-				role: "indicator",
-				unit: "IPv4",
-				read: true,
-				write: true,
-			},
-			native: {},
-		});
-
-		await this.setObjectNotExistsAsync("devicePort", {
-			type: "state",
-			common: {
-				name: "devicePort", 
+				name: "devicePort",
 				type: "string",
 				role: "indicator",
 				unit: "Port",
@@ -96,7 +83,7 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		await this.setObjectNotExistsAsync("devicePollInterval", {
+		await this.setObjectNotExistsAsync("Device.devicePollInterval", {
 			type: "state",
 			common: {
 				name: "devicePollInterval",
@@ -127,9 +114,9 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("devicePort");
 		this.subscribeStates("devicePollInterval");
 
-		await this.setStateAsync("deviceIP", { val: this.config.device_network_ip, ack: true });
-		await this.setStateAsync("devicePort", { val: this.config.device_network_port, ack: true });
-		await this.setStateAsync("devicePollInterval", { val: this.config.device_poll_interval, ack: true });
+		await this.setStateAsync("Device.deviceIP", { val: this.config.device_network_ip, ack: true });
+		await this.setStateAsync("Device.devicePort", { val: this.config.device_network_port, ack: true });
+		await this.setStateAsync("Device.devicePollInterval", { val: this.config.device_poll_interval, ack: true });
 
 		// You can also add a subscription for multiple states. The following line watches all states starting with "lights."
 		// this.subscribeStates("lights.*");
