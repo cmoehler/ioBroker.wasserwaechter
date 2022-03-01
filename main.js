@@ -233,19 +233,16 @@ if (require.main !== module) {
 function pollData(){
 
 	myAdapter.log.info("trigger erhalten");
-	const reqstring = "http://192.168.70.26:5333/safe-tec/get/BAT";
-	// BAT VOL AVO LTV
+
+	// Zustandsdaten abrufen
+	setTimeout(getTotalWaterVolume, 1000);
+	setTimeout(getLastWaterVolume, 2000);
+	setTimeout(currentWaterVolume, 3000);
+	setTimeout(batterieVoltage, 4000);
+}
+
+function batterieVoltage(){
 	// Spannung Stützbatterie BAT
-	//setTimeout(GetDeviceState,counter * delayTime, "BAT");}
-	if(false){
-		let requestBatterieVoltage = require("request");
-
-		myAdapter.log.info(requestBatterieVoltage(reqstring).on("response", function(response) {
-			myAdapter.log.info(response.statusCode);	// 200
-			myAdapter.log.info(response.headers["content-type"]);
-		}));
-	}
-
 	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
 
 	axios.get(url + "BAT")
@@ -256,7 +253,10 @@ function pollData(){
 		.catch(function(error){
 			myAdapter.log.error(error);
 		});
+}
 
+function currentWaterVolume(){
+	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
 
 	axios.get(url + "AVO")
 		.then(function(response){
@@ -266,9 +266,6 @@ function pollData(){
 		.catch(function(error){
 			myAdapter.log.error(error);
 		});
-
-	setTimeout(getTotalWaterVolume, 1000);
-	setTimeout(getLastWaterVolume, 1000);
 }
 
 function getLastWaterVolume(){
