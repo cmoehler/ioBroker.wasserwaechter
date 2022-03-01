@@ -256,7 +256,9 @@ function getBatterieVoltage(){
 	axios.get(prepareGetRequest("BAT"))
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
+			const btv = parseFloat(String(response.data.getBAT).replace(",",".")).toFixed(1);
 			myAdapter.log.info("Batteriespannung = " + response.data.getBAT + " Volt");
+			myAdapter.log.info("Batteriespannung = " + String(btv) + " Volt (Zahl)");
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
@@ -304,7 +306,7 @@ function getAlarm(){
 	axios.get(prepareGetRequest("ALA"))
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
-			myAdapter.log.info("Letzter Alarm = " + response.data.getALA);
+			myAdapter.log.info("Alarm Code = " + response.data.getALA);
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
