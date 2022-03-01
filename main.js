@@ -262,9 +262,9 @@ function GetDeviceState(CMD){
 			else{
 				myAdapter.log.error("Error HTTP Request");
 			}
-		}).on("error", function (e) {myAdapter.log.error(e);});}
+		}).on("error", function (e) {myAdapter.log.error("try " + e);});}
 	catch (e) {
-		myAdapter.log.error(e);
+		myAdapter.log.error("catch " + e);
 	}
 	return answer;
 }
