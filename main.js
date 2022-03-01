@@ -72,7 +72,7 @@ class Wasserwaechter extends utils.Adapter {
 		await this.setObjectNotExistsAsync("devicePort", {
 			type: "state",
 			common: {
-				name: "devicePort",
+				name: "devicePort", 
 				type: "string",
 				role: "indicator",
 				read: true,
@@ -87,6 +87,7 @@ class Wasserwaechter extends utils.Adapter {
 				name: "devicePollInterval",
 				type: "string",
 				role: "indicator",
+				unit: "s",
 				read: true,
 				write: true,
 			},
@@ -231,6 +232,7 @@ if (require.main !== module) {
 
 
 function prepareGetRequest(command){
+	// URL aus den Settings-Daten zusammenbauen
 	return "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + command;
 }
 
