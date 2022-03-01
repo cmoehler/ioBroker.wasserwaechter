@@ -249,7 +249,16 @@ function pollData(){
 	axios.get(url + "BAT")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
-			myAdapter.log.info("Batteriespannung = " + response.data.getBAT + "Volt");
+			myAdapter.log.info("Batteriespannung = " + response.data.getBAT + " Volt");
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+
+		axios.get(url + "LTV")
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Letztes gezapftes Volumen = " + response.data.getLTV + " Liter");
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
