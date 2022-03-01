@@ -12,6 +12,8 @@ const { request } = require("http");
 const { resolve } = require("path");
 const { resourceLimits } = require("worker_threads");
 
+const axios = require("axios");
+
 let Intervall_ID;
 
 //Reference to my own adapter
@@ -227,9 +229,6 @@ if (require.main !== module) {
 	new Wasserwaechter();
 }
 
-function delay(time) {
-	return new Promise(resolve => setTimeout(resolve, time));
-}
 
 function pollData(){
 
@@ -247,8 +246,6 @@ function pollData(){
 		}));
 	}
 
-	const axios = require("axios");
-	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
 
 	axios.get(url + "BAT")
 		.then(function(response){
@@ -259,7 +256,6 @@ function pollData(){
 			myAdapter.log.error(error);
 		});
 
-	delay(1000).then(() => myAdapter.log.info("1 Sekunde vorbei"));
 
 	axios.get(url + "LTV")
 		.then(function(response){
@@ -270,7 +266,6 @@ function pollData(){
 			myAdapter.log.error(error);
 		});
 
-	delay(1000).then(() => myAdapter.log.info("1 Sekunde vorbei"));
 
 	axios.get(url + "AVO")
 		.then(function(response){
@@ -281,8 +276,11 @@ function pollData(){
 			myAdapter.log.error(error);
 		});
 
-	delay(1000).then(() => myAdapter.log.info("1 Sekunde vorbei"));
+	setTimeout(getTotalWaterVolume, 5000);
+}
 
+function getTotalWaterVolume(){
+	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
 	axios.get(url + "VOL")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
