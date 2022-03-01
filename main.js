@@ -231,7 +231,7 @@ function pollData(){
 	const delayTime = 1000;
 	let counter = 0;
 	// Spannung Stützbatterie BAT
-	setTimeout(SaveBatteryVoltage,counter * delayTime);
+	setTimeout(GetDeviceState,counter * delayTime, "BAT");
 	if(false){
 		counter++;
 		// Gesamtwassermenge VOL
@@ -253,6 +253,7 @@ function GetDeviceState(CMD){
 	// Spannung Stützbatterie
 	try {
 		request(prepareGetRequest(CMD), function (error, response, result) {
+		//request(prepareGetRequest(CMD), function (error, response, result) {
 			if (result != null) {
 				myAdapter.log.info(result);
 				answer = result;
