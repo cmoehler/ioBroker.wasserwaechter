@@ -275,10 +275,10 @@ function getBatterieVoltage(){
 	axios.get(prepareGetRequest("BAT"))
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
-			const btv = parseFloat(String(response.data.getBAT).replace(",",".")).toFixed(1);
+			const btv = parseFloat(String(response.data.getBAT).replace(",",".")).toFixed(2);
 			myAdapter.log.info("Batteriespannung = " + response.data.getBAT + " Volt");
 			myAdapter.log.info("Batteriespannung = " + String(btv) + " Volt (Zahl)");
-			myAdapter.setStateAsync("Device.BatteryVoltage", { val: btv, ack: true });
+			myAdapter.setStateAsync("Device.BatteryVoltage", { val: parseFloat(String(response.data.getBAT).replace(",",".")).toFixed(2), ack: true });
 
 		})
 		.catch(function(error){
