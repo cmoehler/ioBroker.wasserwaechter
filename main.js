@@ -252,7 +252,7 @@ function GetDeviceState(CMD){
 	let answer;
 	// Spannung Stützbatterie
 	try {
-		request(prepareGetRequest(CMD), function (error, response, result) {
+		require("request")(prepareGetRequest(CMD), function (error, response, result) {
 		//request(prepareGetRequest(CMD), function (error, response, result) {
 			if (result != null) {
 				myAdapter.log.info(result);
