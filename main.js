@@ -249,9 +249,7 @@ function pollData(){
 	axios.get(url + "BAT")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
-			myAdapter.log.info(String(response.data));
-			const obj = JSON.parse(response.data);
-			myAdapter.log.info("Batteriespannung = " + obj.getBAT + "Volt");
+			myAdapter.log.info("Batteriespannung = " + response.data.getBAT + "Volt");
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
