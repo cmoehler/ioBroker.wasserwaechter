@@ -230,18 +230,26 @@ if (require.main !== module) {
 }
 
 
+function prepareGetRequest(command){
+	const requeststring = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + command;
+	myAdapter.log.info("Request String: " + requeststring);
+	return requeststring;
+}
+
 function pollData(){
 
 	myAdapter.log.info("trigger erhalten");
+	const delayTimeMS = 1000;
 
 	// Zustandsdaten abrufen
-	setTimeout(getTotalWaterVolume, 1000);
-	setTimeout(getLastWaterVolume, 2000);
-	setTimeout(currentWaterVolume, 3000);
-	setTimeout(batterieVoltage, 4000);
+	setTimeout(getTotalWaterVolume, 0 * delayTimeMS);
+	setTimeout(getLastWaterVolume, 1 * delayTimeMS);
+	setTimeout(currentWaterVolume, 2 * delayTimeMS);
+	setTimeout(getBatterieVoltage, 3 * delayTimeMS);
+	setTimeout(getAlarm, 4 * delayTimeMS);
 }
 
-function batterieVoltage(){
+function getBatterieVoltage(){
 	// Spannung Stützbatterie BAT
 	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
 
@@ -256,6 +264,7 @@ function batterieVoltage(){
 }
 
 function currentWaterVolume(){
+	// Aktuelle Wasserentnahme AVO
 	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
 
 	axios.get(url + "AVO")
@@ -269,6 +278,7 @@ function currentWaterVolume(){
 }
 
 function getLastWaterVolume(){
+	// Letztes gezapftes Volumen LTV
 	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
 
 	axios.get(url + "LTV")
@@ -282,8 +292,8 @@ function getLastWaterVolume(){
 }
 
 function getTotalWaterVolume(){
-	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
-	axios.get(url + "VOL")
+	// Gesamtes Volumen VOL
+	axios.get(prepareGetRequest("VOL"))
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Gesamtwasserverbrauch = " + response.data.getVOL + " Liter");
@@ -293,29 +303,15 @@ function getTotalWaterVolume(){
 		});
 }
 
-function GetDeviceState(CMD){
-	let answer;
-	// Spannung Stützbatterie
-	try {
-		require("request")(prepareGetRequest(CMD), function (error, response, result) {
-		//request(prepareGetRequest(CMD), function (error, response, result) {
-			if (result != null) {
-				myAdapter.log.info(result);
-				answer = result;
-			// setState("a_andreas.0.sys_variablen.Objekt_JSON", result, true);
-			}
-			else{
-				myAdapter.log.error("Error HTTP Request -> State: " + CMD);
-			}
-		}).on("error", function (e) {myAdapter.log.error("try " + e);});}
-	catch (e) {
-		myAdapter.log.error("catch " + e);
-	}
-	return answer;
+function getAlarm(){
+	// Alarm ALA
+	axios.get(prepareGetRequest("ALA"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Letzter Alarm = " + response.data.getALA);
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
 }
 
-function prepareGetRequest(command){
-	const requeststring = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + command;
-	myAdapter.log.info("Request String: " + requeststring);
-	return requeststring;
-}
