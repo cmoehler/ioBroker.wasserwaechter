@@ -258,16 +258,6 @@ function pollData(){
 		});
 
 
-	axios.get(url + "LTV")
-		.then(function(response){
-			myAdapter.log.info(JSON.stringify(response.data));
-			myAdapter.log.info("Letztes gezapftes Volumen = " + response.data.getLTV + " Liter");
-		})
-		.catch(function(error){
-			myAdapter.log.error(error);
-		});
-
-
 	axios.get(url + "AVO")
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
@@ -277,7 +267,21 @@ function pollData(){
 			myAdapter.log.error(error);
 		});
 
-	setTimeout(getTotalWaterVolume, 5000);
+	setTimeout(getTotalWaterVolume, 1000);
+	setTimeout(getLastWaterVolume, 1000);
+}
+
+function getLastWaterVolume(){
+	const url = "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/";
+
+	axios.get(url + "LTV")
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Letztes gezapftes Volumen = " + response.data.getLTV + " Liter");
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
 }
 
 function getTotalWaterVolume(){
