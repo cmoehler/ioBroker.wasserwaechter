@@ -407,6 +407,7 @@ async function initProfiles(){
 		// alle 8 möglichen Profile durchlaufen
 		for(let i = 1; i < 9; i++)
 		{
+			// Profil Status
 			getProfilesStatus(i);
 			await sleep(1000);
 
@@ -420,6 +421,10 @@ async function initProfiles(){
 				myAdapter.log.info("Profil " + String(i) + " ist inaktiv");
 				myAdapter.setStateAsync("Profiles." + String(i) +".Aktiv", { val: "not active", ack: true });
 			}
+
+			// Profil Name
+			getProfilesName(i);
+			await sleep(1000);
 		}
 	}else{
 		myAdapter.log.info("Keine Aktiven Profile!!!");
@@ -457,21 +462,6 @@ async function pollData(){
 	 */
 }
 
-function getProfileDetails(existingProfiles){
-	for (let i = 0; i < existingProfiles; i++){
-		myAdapter.setObjectNotExistsAsync("Profiles." + String(i + 1) +".Name", {
-			type: "state",
-			common: {
-				name: "Profil Name",
-				type: "string",
-				role: "indicator",
-				read: true,
-				write: true,
-			},
-			native: {},
-		});
-	}
-}
 
 function getProfilesStatus(ProfileNumber){
 	// Ermitteln ob Profil aktiv ist
@@ -521,6 +511,56 @@ function getProfilesStatus(ProfileNumber){
 			universalReturnValue = null;
 		});
 }
+
+function getProfilesName(ProfileNumber){
+	// Profil Name ermitteln PNx
+	axios.get(prepareGetRequest("PN" + String(ProfileNumber)))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			switch(ProfileNumber)
+			{
+				case 1:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Name = " + String(response.data.getPN1));
+					universalReturnValue = response.data.getPN1;
+					break;
+				case 2:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Name = " + String(response.data.getPN2));
+					universalReturnValue = response.data.getPN2;
+					break;
+				case 3:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Name = " + String(response.data.getPN3));
+					universalReturnValue = response.data.getPN3;
+					break;
+				case 4:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Name = " + String(response.data.getPN4));
+					universalReturnValue = response.data.getPN4;
+					break;
+				case 5:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Name = " + String(response.data.getPN5));
+					universalReturnValue = response.data.getPN5;
+					break;
+				case 6:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Name = " + String(response.data.getPN6));
+					universalReturnValue = response.data.getPN6;
+					break;
+				case 7:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Name = " + String(response.data.getPN7));
+					universalReturnValue = response.data.getPN7;
+					break;
+				case 8:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Name = " + String(response.data.getPN8));
+					universalReturnValue = response.data.getPN8;
+					break;
+				default:
+					universalReturnValue = null;
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+			universalReturnValue = null;
+		});
+}
+
 
 function getNumActiveProfiles(){
 	// Anzahl Profile PRN
