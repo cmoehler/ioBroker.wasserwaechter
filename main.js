@@ -208,6 +208,34 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		// Die Objekte für die 8 Profile erstellen
+		for (let i = 1; i < 9; i++){
+			// Profil Name
+			myAdapter.setObjectNotExistsAsync("Profiles." + String(i) +".Name", {
+				type: "state",
+				common: {
+					name: "Profil Name",
+					type: "string",
+					role: "indicator",
+					read: true,
+					write: true,
+				},
+				native: {},
+			});
+
+			// Profil Aktiv
+			myAdapter.setObjectNotExistsAsync("Profiles." + String(i) +".Aktiv", {
+				type: "state",
+				common: {
+					name: "Profil Aktiv",
+					type: "string",
+					role: "indicator",
+					read: true,
+					write: true,
+				},
+				native: {},
+			});
+		}
 
 
 		// In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
@@ -222,6 +250,12 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Consumptions.TotalVolume");
 		this.subscribeStates("Consumptions.CurrentVolume");
 		this.subscribeStates("Profiles.Active");
+
+		// Die 8Profil Events adoptieren
+		for (let i = 1; i < 9; i++){
+			this.subscribeStates("Profiles." + String(i) +".Name");
+			this.subscribeStates("Profiles." + String(i) +".Aktiv");
+		}
 
 		// Settings in Objekte schreiben
 		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
@@ -361,29 +395,30 @@ async function initProfiles(){
 
 	myAdapter.log.info("init Profile trigger erhalten");
 
-	// aktive Profile ermitteln
+	// anzahl aktive Profile ermitteln
 	getNumActiveProfiles();
 	await sleep(1000);
 
 	if(universalReturnValue != null){
 
-		myAdapter.log.info("nach Rückgabe: Aktive Profile = " + String(universalReturnValue));
+		myAdapter.log.info("Wir haben " + String(universalReturnValue) +" Aktive Profile.");
 		myAdapter.setStateAsync("Profiles.Active", { val: universalReturnValue, ack: true });
 
-
+		// alle 8 möglichen Profile durchlaufen
 		for(let i = 1; i < 9; i++)
 		{
 			getProfilesStatus(i);
 			await sleep(1000);
-			myAdapter.log.info("i in for/next = " + String(universalReturnValue));
 
 			if(String(universalReturnValue) == "1")
 			{
 				myAdapter.log.info("Profil " + String(i) + " ist aktiv");
+				myAdapter.setStateAsync("Profiles." + String(i) +".Aktiv", { val: "active", ack: true });
 			}
 			else
 			{
 				myAdapter.log.info("Profil " + String(i) + " ist inaktiv");
+				myAdapter.setStateAsync("Profiles." + String(i) +".Aktiv", { val: "not active", ack: true });
 			}
 		}
 	}else{
