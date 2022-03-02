@@ -362,13 +362,14 @@ async function initProfiles(){
 
 	// aktive Profile ermitteln
 	const ActiveProfiles = getNumActiveProfiles();
+	myAdapter.log.info("nach Rückgabe: Aktive Profile = " + String(ActiveProfiles));
 	myAdapter.setStateAsync("Profiles.Active", { val: ActiveProfiles, ack: true });
 	await sleep(1000);
-	myAdapter.log.info("Aktive Profile = " + String(ActiveProfiles));
+	myAdapter.log.info("nach SetState: Aktive Profile = " + String(ActiveProfiles));
 
 	for(let i = 1; i < 9; i++)
 	{
-		myAdapter.log.info("Aktive Profile = " + String(ActiveProfiles));
+		myAdapter.log.info("in for/next Schleife: Aktive Profile = " + String(ActiveProfiles));
 		const CurrentProjectStatus = getProfilesStatus(i);
 		await sleep(1000);
 		myAdapter.log.info("i in for/next = " + String(CurrentProjectStatus));
@@ -478,7 +479,7 @@ function getNumActiveProfiles(){
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Aktive Profile = " + response.data.getPRN + " Stück");
-			return response.data.getPRN;
+			return String(response.data.getPRN);
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
