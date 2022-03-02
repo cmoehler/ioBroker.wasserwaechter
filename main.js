@@ -254,7 +254,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.log.info("check group user admin group admin: " + result);
 
 		// Profile erforschen
-		await initProfiles();
+		initProfiles();
 
 		// Timer für das Polling starten
 		Intervall_ID = setInterval(pollData, parseInt(this.config.device_poll_interval) * 1000);
@@ -358,6 +358,7 @@ function prepareGetRequest(command){
 async function initProfiles(){
 
 	myAdapter.log.info("init Profile trigger erhalten");
+
 	// aktive Profile ermitteln
 	const ActiveProfiles = getNumActiveProfiles();
 	await sleep(1000);
