@@ -364,13 +364,15 @@ async function initProfiles(){
 	const ActiveProfiles = getNumActiveProfiles();
 	myAdapter.setStateAsync("Profiles.Active", { val: ActiveProfiles, ack: true });
 	await sleep(1000);
-	myAdapter.log.info("Aktive Projekte = " + String(ActiveProfiles));
+	myAdapter.log.info("Aktive Profile = " + String(ActiveProfiles));
 
 	for(let i = 1; i < 9; i++)
 	{
+		myAdapter.log.info("Aktive Profile = " + String(ActiveProfiles));
 		const CurrentProjectStatus = getProfilesStatus(i);
 		await sleep(1000);
 		myAdapter.log.info("i in for/next = " + String(CurrentProjectStatus));
+
 		if(String(CurrentProjectStatus) == "1")
 		{
 			myAdapter.log.info("Profil " + String(i) + " ist aktiv");
