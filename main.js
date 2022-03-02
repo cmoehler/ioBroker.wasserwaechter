@@ -17,8 +17,6 @@ const { stringify } = require("querystring");
 
 let Intervall_ID;
 
-let existingProfiles = 0;
-
 //Reference to my own adapter
 let myAdapter;
 
@@ -197,7 +195,7 @@ class Wasserwaechter extends utils.Adapter {
 
 		// Profile
 
-		await this.setObjectNotExistsAsync("Profiles.Existing", {
+		await this.setObjectNotExistsAsync("Profiles.Active", {
 			type: "state",
 			common: {
 				name: "Existing Profiles",
@@ -222,7 +220,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Consumptions.LastVolume");
 		this.subscribeStates("Consumptions.TotalVolume");
 		this.subscribeStates("Consumptions.CurrentVolume");
-		this.subscribeStates("Profiles.Existing");
+		this.subscribeStates("Profiles.Active");
 
 		// Settings in Objekte schreiben
 		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
@@ -359,7 +357,25 @@ function prepareGetRequest(command){
 
 async function initProfiles(){
 
+	// aktive Profile ermitteln
+	const ActiveProfiles = getNumActiveProfiles();
+	myAdapter.setStateAsync("Profiles.Active", { val: ActiveProfiles, ack: true });
 	await sleep(1000);
+	if(ActiveProfiles != null){
+		for(let i = 1; i < 9; i++)
+		{
+			if(String(getProfilesStatus(i)) == "1")
+			{
+				myAdapter.log.info("Profil " + String(i) + " ist aktiv");
+			}
+			else
+			{
+				myAdapter.log.info("Profil " + String(i) + " ist inaktiv");
+			}
+			await sleep(1000);
+		}
+	}
+
 }
 
 async function pollData(){
@@ -377,8 +393,6 @@ async function pollData(){
 	getAlarm();
 	await sleep(delayTimeMS);
 	getStopValve();
-	await sleep(delayTimeMS);
-	getNumProfiles();
 
 	/**
 	setTimeout(getTotalWaterVolume, 0 * delayTimeMS);
@@ -408,17 +422,58 @@ function getProfileDetails(){
 	}
 }
 
-function getNumProfiles(){
+function getProfilesStatus(ProfileNumber){
+	// Ermitteln ob Profil aktiv ist
+	axios.get(prepareGetRequest("PA" + String(ProfileNumber)))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			switch(ProfileNumber)
+			{
+				case 1:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA1));
+					return response.data.getPA1;
+				case 2:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA2));
+					return response.data.getPA2;
+				case 3:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA3));
+					return response.data.getPA3;
+				case 4:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA4));
+					return response.data.getPA4;
+				case 5:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA5));
+					return response.data.getPA5;
+				case 6:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA6));
+					return response.data.getPA6;
+				case 7:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA7));
+					return response.data.getPA7;
+				case 8:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA8));
+					return response.data.getPA8;
+				default:
+					return null;
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+			return null;
+		});
+}
+
+function getNumActiveProfiles(){
 	// Anzahl Profile PRN
 	axios.get(prepareGetRequest("PRN"))
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
-			myAdapter.log.info("Vorhandene Profile = " + response.data.getPRN + " Stück");
-			myAdapter.setStateAsync("Profiles.Existing", { val: response.data.getPRN, ack: true });
-			existingProfiles = parseFloat(response.data.getPRN);
+			myAdapter.log.info("Aktive Profile = " + response.data.getPRN + " Stück");
+			return parseFloat(response.data.getPRN);
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
+			return null;
 		});
 }
 
