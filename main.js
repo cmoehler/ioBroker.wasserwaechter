@@ -381,6 +381,9 @@ async function initProfiles(){
 			await sleep(1000);
 		}
 	}
+	else{
+		myAdapter.log.info("Else getroffen: ActiveProfiles sollte demnach NULL sein?? = " + String(ActiveProfiles));
+	}
 
 }
 
