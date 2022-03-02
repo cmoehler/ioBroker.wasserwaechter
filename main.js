@@ -210,6 +210,19 @@ class Wasserwaechter extends utils.Adapter {
 
 		// Die Objekte für die 8 Profile erstellen
 		for (let i = 1; i < 9; i++){
+			// Profil Aktiv
+			await this.setObjectNotExistsAsync("Profiles." + String(i) + ".Aktiv", {
+				type: "state",
+				common: {
+					name: "Profil Aktiv",
+					type: "string",
+					role: "indicator",
+					read: true,
+					write: true,
+				},
+				native: {},
+			});
+
 			// Profil Name
 			await this.setObjectNotExistsAsync("Profiles." + String(i) + ".Name", {
 				type: "state",
@@ -223,18 +236,20 @@ class Wasserwaechter extends utils.Adapter {
 				native: {},
 			});
 
-			// Profil Aktiv
-			await this.setObjectNotExistsAsync("Profiles." + String(i) + ".Aktiv", {
+			// Profil Volume Leckage
+			await this.setObjectNotExistsAsync("Profiles." + String(i) + ".LeakVolume", {
 				type: "state",
 				common: {
-					name: "Profil Aktiv",
+					name: "Profil Volume Leak",
 					type: "string",
 					role: "indicator",
+					unit: "L",
 					read: true,
 					write: true,
 				},
 				native: {},
 			});
+
 		}
 
 
@@ -255,6 +270,7 @@ class Wasserwaechter extends utils.Adapter {
 		for (let i = 1; i < 9; i++){
 			this.subscribeStates("Profiles." + String(i) +".Name");
 			this.subscribeStates("Profiles." + String(i) +".Aktiv");
+			this.subscribeStates("Profiles." + String(i) +".LeakVolume");
 		}
 
 		// Settings in Objekte schreiben
@@ -415,9 +431,7 @@ async function initProfiles(){
 			{
 				myAdapter.log.info("Profil " + String(i) + " ist aktiv");
 				myAdapter.setStateAsync("Profiles." + String(i) +".Aktiv", { val: "active", ack: true });
-			}
-			else
-			{
+			}else{
 				myAdapter.log.info("Profil " + String(i) + " ist inaktiv");
 				myAdapter.setStateAsync("Profiles." + String(i) +".Aktiv", { val: "not active", ack: true });
 			}
@@ -427,6 +441,18 @@ async function initProfiles(){
 			await sleep(1000);
 			myAdapter.log.info("Profil " + String(i) + " Name: " + String(universalReturnValue));
 			myAdapter.setStateAsync("Profiles." + String(i) +".Name", { val: String(universalReturnValue), ack: true });
+
+			// Leckage Volumen
+			getProfilesLeakVolume(i);
+			await sleep(1000);
+			if(String(universalReturnValue) == "0")
+			{
+				myAdapter.log.info("Profil " + String(i) + " Leak Volume: disabled");
+				myAdapter.setStateAsync("Profiles." + String(i) +".LeakVolume", { val: "disabled", ack: true });
+			}else{
+				myAdapter.log.info("Profil " + String(i) + " Leak Volume: " + String(universalReturnValue));
+				myAdapter.setStateAsync("Profiles." + String(i) +".LeakVolume", { val: String(universalReturnValue), ack: true });
+			}
 		}
 
 	}else{
@@ -564,6 +590,54 @@ function getProfilesName(ProfileNumber){
 		});
 }
 
+function getProfilesLeakVolume(ProfileNumber){
+	// Profil Name ermitteln PNx
+	axios.get(prepareGetRequest("PV" + String(ProfileNumber)))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			switch(ProfileNumber)
+			{
+				case 1:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Volume = " + String(response.data.getPV1));
+					universalReturnValue = response.data.getPV1;
+					break;
+				case 2:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Volume = " + String(response.data.getPV2));
+					universalReturnValue = response.data.getPV2;
+					break;
+				case 3:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Volume = " + String(response.data.getPV3));
+					universalReturnValue = response.data.getPV3;
+					break;
+				case 4:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Volume = " + String(response.data.getPV4));
+					universalReturnValue = response.data.getPV4;
+					break;
+				case 5:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Volume = " + String(response.data.getPV5));
+					universalReturnValue = response.data.getPV5;
+					break;
+				case 6:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Volume = " + String(response.data.getPV6));
+					universalReturnValue = response.data.getPV6;
+					break;
+				case 7:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Volume = " + String(response.data.getPV7));
+					universalReturnValue = response.data.getPV7;
+					break;
+				case 8:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Volume = " + String(response.data.getPV8));
+					universalReturnValue = response.data.getPV8;
+					break;
+				default:
+					universalReturnValue = null;
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+			universalReturnValue = null;
+		});
+}
 
 function getNumActiveProfiles(){
 	// Anzahl Profile PRN
