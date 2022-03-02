@@ -198,7 +198,7 @@ class Wasserwaechter extends utils.Adapter {
 		await this.setObjectNotExistsAsync("Profiles.Active", {
 			type: "state",
 			common: {
-				name: "Existing Profiles",
+				name: "Active Profiles",
 				type: "string",
 				role: "indicator",
 				read: true,
@@ -357,10 +357,11 @@ function prepareGetRequest(command){
 
 async function initProfiles(){
 
+	myAdapter.log.info("init Profile trigger erhalten");
 	// aktive Profile ermitteln
 	const ActiveProfiles = getNumActiveProfiles();
-	myAdapter.setStateAsync("Profiles.Active", { val: ActiveProfiles, ack: true });
 	await sleep(1000);
+	myAdapter.setStateAsync("Profiles.Active", { val: ActiveProfiles, ack: true });
 	if(ActiveProfiles != null){
 		for(let i = 1; i < 9; i++)
 		{
