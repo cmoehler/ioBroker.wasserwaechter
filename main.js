@@ -250,6 +250,20 @@ class Wasserwaechter extends utils.Adapter {
 				native: {},
 			});
 
+			// Profil Zeit Leckage
+			await this.setObjectNotExistsAsync("Profiles." + String(i) + ".LeakTime", {
+				type: "state",
+				common: {
+					name: "Profil Time Leak",
+					type: "string",
+					role: "indicator",
+					unit: "min",
+					read: true,
+					write: true,
+				},
+				native: {},
+			});
+
 		}
 
 
@@ -271,6 +285,7 @@ class Wasserwaechter extends utils.Adapter {
 			this.subscribeStates("Profiles." + String(i) +".Name");
 			this.subscribeStates("Profiles." + String(i) +".Aktiv");
 			this.subscribeStates("Profiles." + String(i) +".LeakVolume");
+			this.subscribeStates("Profiles." + String(i) +".LeakTime");
 		}
 
 		// Settings in Objekte schreiben
@@ -450,8 +465,20 @@ async function initProfiles(){
 				myAdapter.log.info("Profil " + String(i) + " Leak Volume: disabled");
 				myAdapter.setStateAsync("Profiles." + String(i) +".LeakVolume", { val: "disabled", ack: true });
 			}else{
-				myAdapter.log.info("Profil " + String(i) + " Leak Volume: " + String(universalReturnValue));
+				myAdapter.log.info("Profil " + String(i) + " Leak Volume: " + String(universalReturnValue) + " L");
 				myAdapter.setStateAsync("Profiles." + String(i) +".LeakVolume", { val: String(universalReturnValue), ack: true });
+			}
+
+			// Leckage Zeit
+			getProfilesLeakTime(i);
+			await sleep(1000);
+			if(String(universalReturnValue) == "0")
+			{
+				myAdapter.log.info("Profil " + String(i) + " Leak Time: disabled");
+				myAdapter.setStateAsync("Profiles." + String(i) +".LeakTime", { val: "disabled", ack: true });
+			}else{
+				myAdapter.log.info("Profil " + String(i) + " Leak Time: " + String(universalReturnValue) + " min");
+				myAdapter.setStateAsync("Profiles." + String(i) +".LeakTime", { val: String(universalReturnValue), ack: true });
 			}
 		}
 
@@ -591,7 +618,7 @@ function getProfilesName(ProfileNumber){
 }
 
 function getProfilesLeakVolume(ProfileNumber){
-	// Profil Name ermitteln PNx
+	// Profil Volumen Leckage ermitteln PVx
 	axios.get(prepareGetRequest("PV" + String(ProfileNumber)))
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
@@ -628,6 +655,55 @@ function getProfilesLeakVolume(ProfileNumber){
 				case 8:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Volume = " + String(response.data.getPV8));
 					universalReturnValue = response.data.getPV8;
+					break;
+				default:
+					universalReturnValue = null;
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+			universalReturnValue = null;
+		});
+}
+
+function getProfilesLeakTime(ProfileNumber){
+	// Profil Zeit Leckage ermitteln PTx
+	axios.get(prepareGetRequest("PT" + String(ProfileNumber)))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			switch(ProfileNumber)
+			{
+				case 1:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Time = " + String(response.data.getPT1));
+					universalReturnValue = response.data.getPT1;
+					break;
+				case 2:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Time = " + String(response.data.getPT2));
+					universalReturnValue = response.data.getPT2;
+					break;
+				case 3:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Time = " + String(response.data.getPT3));
+					universalReturnValue = response.data.getPT3;
+					break;
+				case 4:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Time = " + String(response.data.getPT4));
+					universalReturnValue = response.data.getPT4;
+					break;
+				case 5:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Time = " + String(response.data.getPT5));
+					universalReturnValue = response.data.getPT5;
+					break;
+				case 6:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Time = " + String(response.data.getPT6));
+					universalReturnValue = response.data.getPT6;
+					break;
+				case 7:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Time = " + String(response.data.getPT7));
+					universalReturnValue = response.data.getPT7;
+					break;
+				case 8:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Time = " + String(response.data.getPT8));
+					universalReturnValue = response.data.getPT8;
 					break;
 				default:
 					universalReturnValue = null;
