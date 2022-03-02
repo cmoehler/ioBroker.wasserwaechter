@@ -57,6 +57,19 @@ class Wasserwaechter extends utils.Adapter {
 		Because every adapter instance uses its own unique namespace variable names can't collide with other adapters variables
 		*/
 
+
+		await this.setObjectNotExistsAsync("testVariable", {
+			type: "state",
+			common: {
+				name: "testVariable",
+				type: "boolean",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 		// Device States
 		await this.setObjectNotExistsAsync("Device.IP", {
 			type: "state",
@@ -97,18 +110,6 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		await this.setObjectNotExistsAsync("testVariable", {
-			type: "state",
-			common: {
-				name: "testVariable",
-				type: "boolean",
-				role: "indicator",
-				read: true,
-				write: true,
-			},
-			native: {},
-		});
-
 		await this.setObjectNotExistsAsync("Device.BatteryVoltage", {
 			type: "state",
 			common: {
@@ -116,6 +117,18 @@ class Wasserwaechter extends utils.Adapter {
 				type: "string",
 				role: "indicator",
 				unit: "V",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+		await this.setObjectNotExistsAsync("Device.StopValve", {
+			type: "state",
+			common: {
+				name: "Device Status Stop Valve",
+				type: "boolean",
+				role: "indicator",
 				read: true,
 				write: true,
 			},
@@ -132,6 +145,8 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Device.IP");
 		this.subscribeStates("Device.Port");
 		this.subscribeStates("Device.PollingInterval");
+		this.subscribeStates("Device.BatteryVoltage");
+		this.subscribeStates("Device.StopValve");
 
 		await this.setStateAsync("Device.IP", { val: this.config.device_network_ip, ack: true });
 		await this.setStateAsync("Device.Port", { val: this.config.device_network_port, ack: true });
@@ -268,6 +283,21 @@ function pollData(){
 	setTimeout(currentWaterVolume, 2 * delayTimeMS);
 	setTimeout(getBatterieVoltage, 3 * delayTimeMS);
 	setTimeout(getAlarm, 4 * delayTimeMS);
+	setTimeout(getStopValve, 5 * delayTimeMS);
+}
+
+function getStopValve(){
+	// Spannung Stützbatterie AB
+	axios.get(prepareGetRequest("AB"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Absperrung = " + response.data.getAB);
+			myAdapter.setStateAsync("Device.StopValve", { val: response.data.getAB, ack: true });
+
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
 }
 
 function getBatterieVoltage(){
