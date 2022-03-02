@@ -425,7 +425,10 @@ async function initProfiles(){
 			// Profil Name
 			getProfilesName(i);
 			await sleep(1000);
+			myAdapter.log.info("Profil " + String(i) + " Name: " + String(universalReturnValue));
+			myAdapter.setStateAsync("Profiles." + String(i) +".Name", { val: String(universalReturnValue), ack: true });
 		}
+
 	}else{
 		myAdapter.log.info("Keine Aktiven Profile!!!");
 		myAdapter.setStateAsync("Profiles.Active", { val: 0, ack: true });
