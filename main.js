@@ -363,12 +363,13 @@ async function initProfiles(){
 
 	// aktive Profile ermitteln
 	getNumActiveProfiles();
+	await sleep(1000);
+
 	if(universalReturnValue != null){
 
 		myAdapter.log.info("nach Rückgabe: Aktive Profile = " + String(universalReturnValue));
 		myAdapter.setStateAsync("Profiles.Active", { val: universalReturnValue, ack: true });
 
-		await sleep(1000);
 
 		for(let i = 1; i < 9; i++)
 		{
