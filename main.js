@@ -304,6 +304,19 @@ class Wasserwaechter extends utils.Adapter {
 				},
 				native: {},
 			});
+
+			// Profil Buzzer
+			await this.setObjectNotExistsAsync("Profiles." + String(i) + ".Buzzer", {
+				type: "state",
+				common: {
+					name: "Profil Buzzer",
+					type: "string",
+					role: "indicator",
+					read: true,
+					write: true,
+				},
+				native: {},
+			});
 		}
 
 
@@ -329,6 +342,7 @@ class Wasserwaechter extends utils.Adapter {
 			this.subscribeStates("Profiles." + String(i) +".LeakMaxFlow");
 			this.subscribeStates("Profiles." + String(i) +".LeakMicroLeakDetection");
 			this.subscribeStates("Profiles." + String(i) +".ReturnTimeToStandardProfile");
+			this.subscribeStates("Profiles." + String(i) +".Buzzer");
 		}
 
 		// Settings in Objekte schreiben
@@ -552,7 +566,7 @@ async function initProfiles(){
 			}
 
 			// Return Time to Standard Profile
-			getReturnTimeToStandardProfile(i);
+			getProfilesReturnTimeToStandard(i);
 			await sleep(1000);
 			if(String(universalReturnValue) == "0")
 			{
@@ -561,6 +575,18 @@ async function initProfiles(){
 			}else{
 				myAdapter.log.info("Profil " + String(i) + " Return Time to Standard Profile: " + String(universalReturnValue) + " h");
 				myAdapter.setStateAsync("Profiles." + String(i) +".ReturnTimeToStandardProfile", { val: String(universalReturnValue), ack: true });
+			}
+
+			// Profile Buzzer
+			getProfileBuzzer(i);
+			await sleep(1000);
+			if(String(universalReturnValue) == "0")
+			{
+				myAdapter.log.info("Profil " + String(i) + " Buzzer: off");
+				myAdapter.setStateAsync("Profiles." + String(i) +".Buzzer", { val: "off", ack: true });
+			}else{
+				myAdapter.log.info("Profil " + String(i) + " Buzzer: on");
+				myAdapter.setStateAsync("Profiles." + String(i) +".Buzzer", { val: "on", ack: true });
 			}
 
 		}
@@ -885,7 +911,7 @@ function getProfilesLeakMicroLeakDetection(ProfileNumber){
 		});
 }
 
-function getReturnTimeToStandardProfile(ProfileNumber){
+function getProfilesReturnTimeToStandard(ProfileNumber){
 	// Profil Return Time to Standard Profile PRx
 	axios.get(prepareGetRequest("PR" + String(ProfileNumber)))
 		.then(function(response){
@@ -923,6 +949,55 @@ function getReturnTimeToStandardProfile(ProfileNumber){
 				case 8:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " Return Time to Standard Profile = " + String(response.data.getPR8));
 					universalReturnValue = response.data.getPR8;
+					break;
+				default:
+					universalReturnValue = null;
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+			universalReturnValue = null;
+		});
+}
+
+function getProfileBuzzer(ProfileNumber){
+	// Profil Buzzer PBx
+	axios.get(prepareGetRequest("PB" + String(ProfileNumber)))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			switch(ProfileNumber)
+			{
+				case 1:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Buzzer = " + String(response.data.getPB1));
+					universalReturnValue = response.data.getPB1;
+					break;
+				case 2:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Buzzer = " + String(response.data.getPB2));
+					universalReturnValue = response.data.getPB2;
+					break;
+				case 3:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Buzzer = " + String(response.data.getPB3));
+					universalReturnValue = response.data.getPB3;
+					break;
+				case 4:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Buzzer = " + String(response.data.getPB4));
+					universalReturnValue = response.data.getPB4;
+					break;
+				case 5:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Buzzer = " + String(response.data.getPB5));
+					universalReturnValue = response.data.getPB5;
+					break;
+				case 6:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Buzzer = " + String(response.data.getPB6));
+					universalReturnValue = response.data.getPB6;
+					break;
+				case 7:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Buzzer = " + String(response.data.getPB7));
+					universalReturnValue = response.data.getPB7;
+					break;
+				case 8:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Buzzer = " + String(response.data.getPB8));
+					universalReturnValue = response.data.getPB8;
 					break;
 				default:
 					universalReturnValue = null;
