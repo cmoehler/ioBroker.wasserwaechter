@@ -343,20 +343,24 @@ if (require.main !== module) {
 	new Wasserwaechter();
 }
 
+function sleep(ms) {
+	return new Promise((resolve) => {
+		setTimeout(resolve, ms);
+	});
+}
 
 function prepareGetRequest(command){
 	// URL aus den Settings-Daten zusammenbauen
 	return "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + command;
 }
 
-function pollData(){
+async function pollData(){
 
 	myAdapter.log.info("trigger erhalten");
 	const delayTimeMS = 1000;
-
-	Promise.delay(1000);
+	await sleep(1000);
 	myAdapter.log.info("1000ms delay");
-	Promise.delay(1000);
+	await sleep(1000);
 	myAdapter.log.info("1000ms delay");
 
 	// Zustandsdaten abrufen
