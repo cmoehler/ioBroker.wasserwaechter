@@ -127,7 +127,7 @@ class Wasserwaechter extends utils.Adapter {
 			type: "state",
 			common: {
 				name: "Device Status Stop Valve",
-				type: "boolean",
+				type: "string",
 				role: "indicator",
 				read: true,
 				write: true,
@@ -291,9 +291,16 @@ function getStopValve(){
 	axios.get(prepareGetRequest("AB"))
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
-			myAdapter.log.info("Absperrung = " + response.data.getAB);
-			myAdapter.setStateAsync("Device.StopValve", { val: response.data.getAB, ack: true });
-
+			if(response.data.getAB === "1"){
+				myAdapter.log.info("Absperrung = offen");
+				myAdapter.setStateAsync("Device.StopValve", { val: "open", ack: true });
+			}else if(response.data.getAB === "2"){
+				myAdapter.setStateAsync("Device.StopValve", { val: "closed", ack: true });
+				myAdapter.log.info("Absperrung = geschlossen");
+			}else{
+				myAdapter.setStateAsync("Device.StopValve", { val: "undefined", ack: true });
+				myAdapter.log.info("Absperrung = undefiniert");
+			}
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
