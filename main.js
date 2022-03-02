@@ -71,7 +71,7 @@ class Wasserwaechter extends utils.Adapter {
 		});
 
 		// Device States
-		await this.setObjectNotExistsAsync("Device.IP", {
+		await this.setObjectNotExistsAsync("Settings.IP", {
 			type: "state",
 			common: {
 				name: "Device IP Address",
@@ -84,7 +84,7 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		await this.setObjectNotExistsAsync("Device.Port", {
+		await this.setObjectNotExistsAsync("Settings.Port", {
 			type: "state",
 			common: {
 				name: "Device API Port",
@@ -97,7 +97,7 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		await this.setObjectNotExistsAsync("Device.PollingInterval", {
+		await this.setObjectNotExistsAsync("Settings.PollingInterval", {
 			type: "state",
 			common: {
 				name: "Device Polling Interval",
@@ -110,7 +110,9 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		await this.setObjectNotExistsAsync("Device.BatteryVoltage", {
+		// Condition States
+
+		await this.setObjectNotExistsAsync("Conditions.BatteryVoltage", {
 			type: "state",
 			common: {
 				name: "Device Battery Voltage",
@@ -123,7 +125,7 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		await this.setObjectNotExistsAsync("Device.StopValve", {
+		await this.setObjectNotExistsAsync("Conditions.StopValve", {
 			type: "state",
 			common: {
 				name: "Device Status Stop Valve",
@@ -135,22 +137,21 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		// Condition States
-
 
 
 
 		// In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
 		this.subscribeStates("testVariable");
-		this.subscribeStates("Device.IP");
-		this.subscribeStates("Device.Port");
-		this.subscribeStates("Device.PollingInterval");
-		this.subscribeStates("Device.BatteryVoltage");
-		this.subscribeStates("Device.StopValve");
+		this.subscribeStates("Settings.IP");
+		this.subscribeStates("Settings.Port");
+		this.subscribeStates("Settings.PollingInterval");
+		this.subscribeStates("Conditions.BatteryVoltage");
+		this.subscribeStates("Conditions.StopValve");
 
-		await this.setStateAsync("Device.IP", { val: this.config.device_network_ip, ack: true });
-		await this.setStateAsync("Device.Port", { val: this.config.device_network_port, ack: true });
-		await this.setStateAsync("Device.PollingInterval", { val: this.config.device_poll_interval, ack: true });
+		// Settings in Objekte schreiben
+		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
+		await this.setStateAsync("Settings.Port", { val: this.config.device_network_port, ack: true });
+		await this.setStateAsync("Settings.PollingInterval", { val: this.config.device_poll_interval, ack: true });
 
 		// You can also add a subscription for multiple states. The following line watches all states starting with "lights."
 		// this.subscribeStates("lights.*");
@@ -293,12 +294,12 @@ function getStopValve(){
 			myAdapter.log.info(JSON.stringify(response.data));
 			if(response.data.getAB === "1"){
 				myAdapter.log.info("Absperrung = offen");
-				myAdapter.setStateAsync("Device.StopValve", { val: "open", ack: true });
+				myAdapter.setStateAsync("Conditions.StopValve", { val: "open", ack: true });
 			}else if(response.data.getAB === "2"){
-				myAdapter.setStateAsync("Device.StopValve", { val: "closed", ack: true });
+				myAdapter.setStateAsync("Conditions.StopValve", { val: "closed", ack: true });
 				myAdapter.log.info("Absperrung = geschlossen");
 			}else{
-				myAdapter.setStateAsync("Device.StopValve", { val: "undefined", ack: true });
+				myAdapter.setStateAsync("Conditions.StopValve", { val: "undefined", ack: true });
 				myAdapter.log.info("Absperrung = undefiniert");
 			}
 		})
@@ -315,7 +316,7 @@ function getBatterieVoltage(){
 			const btv = parseFloat(String(response.data.getBAT).replace(",",".")).toFixed(2);
 			myAdapter.log.info("Batteriespannung = " + response.data.getBAT + " Volt");
 			myAdapter.log.info("Batteriespannung = " + String(btv) + " Volt (Zahl)");
-			myAdapter.setStateAsync("Device.BatteryVoltage", { val: btv, ack: true });
+			myAdapter.setStateAsync("Conditions.BatteryVoltage", { val: btv, ack: true });
 
 		})
 		.catch(function(error){
