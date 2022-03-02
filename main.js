@@ -365,24 +365,18 @@ async function initProfiles(){
 	await sleep(1000);
 	myAdapter.setStateAsync("Profiles.Active", { val: ActiveProfiles, ack: true });
 
-	if(ActiveProfiles != null){
-		myAdapter.log.info("ActiveProfiles ist != null = " + String(ActiveProfiles));
-		for(let i = 1; i < 9; i++)
+	for(let i = 1; i < 9; i++)
+	{
+		myAdapter.log.info("i in for/next = " + String(i));
+		if(String(getProfilesStatus(i)) == "1")
 		{
-			myAdapter.log.info("i in for/next = " + String(i));
-			if(String(getProfilesStatus(i)) == "1")
-			{
-				myAdapter.log.info("Profil " + String(i) + " ist aktiv");
-			}
-			else
-			{
-				myAdapter.log.info("Profil " + String(i) + " ist inaktiv");
-			}
-			await sleep(1000);
+			myAdapter.log.info("Profil " + String(i) + " ist aktiv");
 		}
-	}
-	else{
-		myAdapter.log.info("Else getroffen: ActiveProfiles sollte demnach NULL sein?? = " + String(ActiveProfiles));
+		else
+		{
+			myAdapter.log.info("Profil " + String(i) + " ist inaktiv");
+		}
+		await sleep(1000);
 	}
 
 }
