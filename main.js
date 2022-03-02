@@ -354,6 +354,11 @@ function pollData(){
 	myAdapter.log.info("trigger erhalten");
 	const delayTimeMS = 1000;
 
+	Promise.delay(1000);
+	myAdapter.log.info("1000ms delay");
+	Promise.delay(1000);
+	myAdapter.log.info("1000ms delay");
+
 	// Zustandsdaten abrufen
 	setTimeout(getTotalWaterVolume, 0 * delayTimeMS);
 	setTimeout(getLastWaterVolume, 1 * delayTimeMS);
