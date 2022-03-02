@@ -152,6 +152,19 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		await this.setObjectNotExistsAsync("Consumptions.TotalVolume", {
+			type: "state",
+			common: {
+				name: "Total Volume",
+				type: "string",
+				role: "indicator",
+				unit: "m3",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 
 
 
@@ -163,6 +176,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Conditions.BatteryVoltage");
 		this.subscribeStates("Conditions.StopValve");
 		this.subscribeStates("Consumptions.LastVolume");
+		this.subscribeStates("Consumptions.TotalVolume");
 
 		// Settings in Objekte schreiben
 		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
@@ -371,6 +385,7 @@ function getTotalWaterVolume(){
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Gesamtwasserverbrauch = " + response.data.getVOL + " Liter");
+			myAdapter.setStateAsync("Consumptions.TotalVolume", { val: String(parseFloat(String(response.data.getVOL).replace("Vol[L]","")) / 1000), ack: true });
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
