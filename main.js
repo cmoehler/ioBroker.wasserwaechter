@@ -253,13 +253,14 @@ class Wasserwaechter extends utils.Adapter {
 		result = await this.checkGroupAsync("admin", "admin");
 		this.log.info("check group user admin group admin: " + result);
 
+		myAdapter = this;
+
 		// Profile erforschen
 		initProfiles();
 
 		// Timer für das Polling starten
 		Intervall_ID = setInterval(pollData, parseInt(this.config.device_poll_interval) * 1000);
 
-		myAdapter = this;
 	}
 
 	/**
