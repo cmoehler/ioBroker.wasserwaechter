@@ -79,7 +79,7 @@ class Wasserwaechter extends utils.Adapter {
 				role: "indicator",
 				unit: "IPv4",
 				read: true,
-				write: true,
+				write: false,
 			},
 			native: {},
 		});
@@ -92,7 +92,7 @@ class Wasserwaechter extends utils.Adapter {
 				role: "indicator",
 				unit: "Port",
 				read: true,
-				write: true,
+				write: false,
 			},
 			native: {},
 		});
@@ -105,7 +105,7 @@ class Wasserwaechter extends utils.Adapter {
 				role: "indicator",
 				unit: "s",
 				read: true,
-				write: true,
+				write: false,
 			},
 			native: {},
 		});
@@ -118,7 +118,7 @@ class Wasserwaechter extends utils.Adapter {
 				role: "indicator",
 				unit: "V",
 				read: true,
-				write: true,
+				write: false,
 			},
 			native: {},
 		});
