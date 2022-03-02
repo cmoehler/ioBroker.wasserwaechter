@@ -79,7 +79,7 @@ class Wasserwaechter extends utils.Adapter {
 				role: "indicator",
 				unit: "IPv4",
 				read: true,
-				write: false,
+				write: true,
 			},
 			native: {},
 		});
@@ -92,7 +92,7 @@ class Wasserwaechter extends utils.Adapter {
 				role: "indicator",
 				unit: "Port",
 				read: true,
-				write: false,
+				write: true,
 			},
 			native: {},
 		});
@@ -105,7 +105,7 @@ class Wasserwaechter extends utils.Adapter {
 				role: "indicator",
 				unit: "s",
 				read: true,
-				write: false,
+				write: true,
 			},
 			native: {},
 		});
@@ -120,7 +120,7 @@ class Wasserwaechter extends utils.Adapter {
 				role: "indicator",
 				unit: "V",
 				read: true,
-				write: false,
+				write: true,
 			},
 			native: {},
 		});
@@ -137,6 +137,21 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		// Consumptions States
+
+		await this.setObjectNotExistsAsync("Consumptions.LastVolume", {
+			type: "state",
+			common: {
+				name: "Last Volume",
+				type: "string",
+				role: "indicator",
+				unit: "l",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 
 
 
@@ -147,6 +162,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Settings.PollingInterval");
 		this.subscribeStates("Conditions.BatteryVoltage");
 		this.subscribeStates("Conditions.StopValve");
+		this.subscribeStates("Consumptions.LastVolume");
 
 		// Settings in Objekte schreiben
 		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
@@ -342,6 +358,7 @@ function getLastWaterVolume(){
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Letztes gezapftes Volumen = " + response.data.getLTV + " Liter");
+			myAdapter.setStateAsync("Consumptions.LastVolume", { val: response.data.getLTV, ack: true });
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
