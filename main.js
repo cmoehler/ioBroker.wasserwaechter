@@ -291,6 +291,19 @@ class Wasserwaechter extends utils.Adapter {
 				native: {},
 			});
 
+			// Profil Return Time to Standard Profil
+			await this.setObjectNotExistsAsync("Profiles." + String(i) + ".ReturnTimeToStandardProfile", {
+				type: "state",
+				common: {
+					name: "Returne Time to Standard Profile",
+					type: "string",
+					role: "indicator",
+					unit: "h",
+					read: true,
+					write: true,
+				},
+				native: {},
+			});
 		}
 
 
@@ -315,6 +328,7 @@ class Wasserwaechter extends utils.Adapter {
 			this.subscribeStates("Profiles." + String(i) +".LeakTime");
 			this.subscribeStates("Profiles." + String(i) +".LeakMaxFlow");
 			this.subscribeStates("Profiles." + String(i) +".LeakMicroLeakDetection");
+			this.subscribeStates("Profiles." + String(i) +".ReturnTimeToStandardProfile");
 		}
 
 		// Settings in Objekte schreiben
@@ -535,6 +549,18 @@ async function initProfiles(){
 			}else{
 				myAdapter.log.info("Profil " + String(i) + " Leak MicroLeak Detection ist inaktiv");
 				myAdapter.setStateAsync("Profiles." + String(i) +".LeakMicroLeakDetection", { val: "not active", ack: true });
+			}
+
+			// Return Time to Standard Profile
+			getReturnTimeToStandardProfile(i);
+			await sleep(1000);
+			if(String(universalReturnValue) == "0")
+			{
+				myAdapter.log.info("Profil " + String(i) + " Return Time to Standard Profile: disabled");
+				myAdapter.setStateAsync("Profiles." + String(i) +".ReturnTimeToStandardProfile", { val: "disabled", ack: true });
+			}else{
+				myAdapter.log.info("Profil " + String(i) + " Return Time to Standard Profile: " + String(universalReturnValue) + " h");
+				myAdapter.setStateAsync("Profiles." + String(i) +".ReturnTimeToStandardProfile", { val: String(universalReturnValue), ack: true });
 			}
 
 		}
@@ -848,6 +874,55 @@ function getProfilesLeakMicroLeakDetection(ProfileNumber){
 				case 8:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " Micro Leac Detection = " + String(response.data.getPM8));
 					universalReturnValue = response.data.getPM8;
+					break;
+				default:
+					universalReturnValue = null;
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+			universalReturnValue = null;
+		});
+}
+
+function getReturnTimeToStandardProfile(ProfileNumber){
+	// Profil Return Time to Standard Profile PRx
+	axios.get(prepareGetRequest("PR" + String(ProfileNumber)))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			switch(ProfileNumber)
+			{
+				case 1:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Return Time to Standard Profile = " + String(response.data.getPR1));
+					universalReturnValue = response.data.getPR1;
+					break;
+				case 2:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Return Time to Standard Profile = " + String(response.data.getPR2));
+					universalReturnValue = response.data.getPR2;
+					break;
+				case 3:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Return Time to Standard Profile = " + String(response.data.getPR3));
+					universalReturnValue = response.data.getPR3;
+					break;
+				case 4:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Return Time to Standard Profile = " + String(response.data.getPR4));
+					universalReturnValue = response.data.getPR4;
+					break;
+				case 5:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Return Time to Standard Profile = " + String(response.data.getPR5));
+					universalReturnValue = response.data.getPR5;
+					break;
+				case 6:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Return Time to Standard Profile = " + String(response.data.getPR6));
+					universalReturnValue = response.data.getPR6;
+					break;
+				case 7:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Return Time to Standard Profile = " + String(response.data.getPR7));
+					universalReturnValue = response.data.getPR7;
+					break;
+				case 8:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Return Time to Standard Profile = " + String(response.data.getPR8));
+					universalReturnValue = response.data.getPR8;
 					break;
 				default:
 					universalReturnValue = null;
