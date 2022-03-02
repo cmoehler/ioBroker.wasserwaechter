@@ -137,6 +137,18 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		await this.setObjectNotExistsAsync("Conditions.Alarm", {
+			type: "state",
+			common: {
+				name: "Device Alarm Status",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 		// Consumptions States
 
 		await this.setObjectNotExistsAsync("Consumptions.LastVolume", {
@@ -188,6 +200,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Settings.PollingInterval");
 		this.subscribeStates("Conditions.BatteryVoltage");
 		this.subscribeStates("Conditions.StopValve");
+		this.subscribeStates("Conditions.Alarm");
 		this.subscribeStates("Consumptions.LastVolume");
 		this.subscribeStates("Consumptions.TotalVolume");
 		this.subscribeStates("Consumptions.CurrentVolume");
@@ -413,6 +426,75 @@ function getAlarm(){
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Alarm Code = " + response.data.getALA);
+			switch(String(response.data.getALA)){
+				case "FF":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "NO ALARM", ack: true });
+					myAdapter.log.info("Alarm: NO ALARM");
+					break;
+				case"A1":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "ALARM END SWITCH", ack: true });
+					myAdapter.log.info("Alarm: ALARM END SWITCH");
+					break;
+				case"A2":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "NO NETWORK", ack: true });
+					myAdapter.log.info("Alarm: NO NETWORK");
+					break;
+				case"A3":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "ALARM VOLUME LEAKAGE", ack: true });
+					myAdapter.log.info("Alarm: ALARM VOLUME LEAKAGE");
+					break;
+				case"A4":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "ALARM TIME LEAKAGE", ack: true });
+					myAdapter.log.info("Alarm: ALARM TIME LEAKAGE");
+					break;
+				case"A5":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "ALARM MAX FLOW LEAKAGE", ack: true });
+					myAdapter.log.info("Alarm: ALARM MAX FLOW LEAKAGE");
+					break;
+				case"A6":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "ALARM MICRO LEAKAGE", ack: true });
+					myAdapter.log.info("Alarm: ALARM MICRO LEAKAGE");
+					break;
+				case"A7":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "ALARM EXT. SENSOR LEAKAGE", ack: true });
+					myAdapter.log.info("Alarm: ALARM EXT. SENSOR LEAKAGE");
+					break;
+				case"A8":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "ALARM TURBINE BLOCKED", ack: true });
+					myAdapter.log.info("Alarm: ALARM TURBINE BLOCKED");
+					break;
+				case"A9":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "ALARM PRESSURE SENSOR ERROR", ack: true });
+					myAdapter.log.info("Alarm: ALARM PRESSURE SENSOR ERROR");
+					break;
+				case"AA":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "ALARM TEMPERATURE SENSOR ERROR", ack: true });
+					myAdapter.log.info("Alarm: ALARM TEMPERATURE SENSOR ERROR");
+					break;
+				case"AB":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "ALARM CONDUCTIVITY SENSOR ERROR", ack: true });
+					myAdapter.log.info("Alarm: ALARM CONDUCTIVITY SENSOR ERROR");
+					break;
+				case"AC":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "ALARM TO HIGH CONDUCTIVITY", ack: true });
+					myAdapter.log.info("Alarm: ALARM TO HIGH CONDUCTIVITY");
+					break;
+				case"AD":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "LOW BATTERY", ack: true });
+					myAdapter.log.info("Alarm: LOW BATTERY");
+					break;
+				case"AE":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "WARNING VOLUME LEAKAGE", ack: true });
+					myAdapter.log.info("WARNING VOLUME LEAKAGE");
+					break;
+				case"AF":
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "ALARM NO POWER SUPPLY", ack: true });
+					myAdapter.log.info("ALARM NO POWER SUPPLY");
+					break;
+				default:
+					myAdapter.setStateAsync("Conditions.Alarm", { val: "undefined", ack: true });
+					myAdapter.log.info("Alarm: undefiniert");
+			}
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
