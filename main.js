@@ -20,6 +20,7 @@ let Intervall_ID;
 //Reference to my own adapter
 let myAdapter;
 
+let universalReturnValue = null;
 
 // Load your modules here, e.g.:
 // const fs = require("fs");
@@ -361,29 +362,33 @@ async function initProfiles(){
 	myAdapter.log.info("init Profile trigger erhalten");
 
 	// aktive Profile ermitteln
-	const ActiveProfiles = getNumActiveProfiles();
-	myAdapter.log.info("nach Rückgabe: Aktive Profile = " + String(ActiveProfiles));
-	myAdapter.setStateAsync("Profiles.Active", { val: ActiveProfiles, ack: true });
-	await sleep(1000);
-	myAdapter.log.info("nach SetState: Aktive Profile = " + String(ActiveProfiles));
+	getNumActiveProfiles();
+	if(universalReturnValue != null){
 
-	for(let i = 1; i < 9; i++)
-	{
-		myAdapter.log.info("in for/next Schleife: Aktive Profile = " + String(ActiveProfiles));
-		const CurrentProjectStatus = getProfilesStatus(i);
+		myAdapter.log.info("nach Rückgabe: Aktive Profile = " + String(universalReturnValue));
+		myAdapter.setStateAsync("Profiles.Active", { val: universalReturnValue, ack: true });
+
 		await sleep(1000);
-		myAdapter.log.info("i in for/next = " + String(CurrentProjectStatus));
 
-		if(String(CurrentProjectStatus) == "1")
+		for(let i = 1; i < 9; i++)
 		{
-			myAdapter.log.info("Profil " + String(i) + " ist aktiv");
+			getProfilesStatus(i);
+			await sleep(1000);
+			myAdapter.log.info("i in for/next = " + String(universalReturnValue));
+
+			if(String(universalReturnValue) == "1")
+			{
+				myAdapter.log.info("Profil " + String(i) + " ist aktiv");
+			}
+			else
+			{
+				myAdapter.log.info("Profil " + String(i) + " ist inaktiv");
+			}
 		}
-		else
-		{
-			myAdapter.log.info("Profil " + String(i) + " ist inaktiv");
-		}
+	}else{
+		myAdapter.log.info("Keine Aktiven Profile!!!");
+		myAdapter.setStateAsync("Profiles.Active", { val: 0, ack: true });
 	}
-
 }
 
 async function pollData(){
@@ -441,35 +446,43 @@ function getProfilesStatus(ProfileNumber){
 			{
 				case 1:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA1));
-					return response.data.getPA1;
+					universalReturnValue = response.data.getPA1;
+					break;
 				case 2:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA2));
-					return response.data.getPA2;
+					universalReturnValue = response.data.getPA2;
+					break;
 				case 3:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA3));
-					return response.data.getPA3;
+					universalReturnValue = response.data.getPA3;
+					break;
 				case 4:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA4));
-					return response.data.getPA4;
+					universalReturnValue = response.data.getPA4;
+					break;
 				case 5:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA5));
-					return response.data.getPA5;
+					universalReturnValue = response.data.getPA5;
+					break;
 				case 6:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA6));
-					return response.data.getPA6;
+					universalReturnValue = response.data.getPA6;
+					break;
 				case 7:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA7));
-					return response.data.getPA7;
+					universalReturnValue = response.data.getPA7;
+					break;
 				case 8:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " = " + String(response.data.getPA8));
-					return response.data.getPA8;
+					universalReturnValue = response.data.getPA8;
+					break;
 				default:
-					return null;
+					universalReturnValue = null;
 			}
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
-			return null;
+			universalReturnValue = null;
 		});
 }
 
@@ -479,11 +492,11 @@ function getNumActiveProfiles(){
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Aktive Profile = " + response.data.getPRN + " Stück");
-			return String(response.data.getPRN);
+			universalReturnValue = response.data.getPRN;
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
-			return null;
+			universalReturnValue = null;
 		});
 }
 
