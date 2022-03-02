@@ -278,6 +278,19 @@ class Wasserwaechter extends utils.Adapter {
 				native: {},
 			});
 
+			// Profil Micro Leak Detection
+			await this.setObjectNotExistsAsync("Profiles." + String(i) + ".LeakMicroLeakDetection", {
+				type: "state",
+				common: {
+					name: "Profil Microleak detection",
+					type: "string",
+					role: "indicator",
+					read: true,
+					write: true,
+				},
+				native: {},
+			});
+
 		}
 
 
@@ -301,6 +314,7 @@ class Wasserwaechter extends utils.Adapter {
 			this.subscribeStates("Profiles." + String(i) +".LeakVolume");
 			this.subscribeStates("Profiles." + String(i) +".LeakTime");
 			this.subscribeStates("Profiles." + String(i) +".LeakMaxFlow");
+			this.subscribeStates("Profiles." + String(i) +".LeakMicroLeakDetection");
 		}
 
 		// Settings in Objekte schreiben
@@ -509,6 +523,20 @@ async function initProfiles(){
 				myAdapter.log.info("Profil " + String(i) + " Max Flow: " + String(universalReturnValue) + " L/h");
 				myAdapter.setStateAsync("Profiles." + String(i) +".LeakMaxFlow", { val: String(universalReturnValue), ack: true });
 			}
+
+			// Leak Microleak Detection Status
+			getProfilesLeakMicroLeakDetection(i);
+			await sleep(1000);
+
+			if(String(universalReturnValue) == "1")
+			{
+				myAdapter.log.info("Profil " + String(i) + " Micro LeakD Detection ist aktiv");
+				myAdapter.setStateAsync("Profiles." + String(i) +".LeakMicroLeakDetection", { val: "active", ack: true });
+			}else{
+				myAdapter.log.info("Profil " + String(i) + " Leak MicroLeak Detection ist inaktiv");
+				myAdapter.setStateAsync("Profiles." + String(i) +".LeakMicroLeakDetection", { val: "not active", ack: true });
+			}
+
 		}
 
 	}else{
@@ -771,6 +799,55 @@ function getProfilesLeakMaxFlow(ProfileNumber){
 				case 8:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Max Flow = " + String(response.data.getPF8));
 					universalReturnValue = response.data.getPF8;
+					break;
+				default:
+					universalReturnValue = null;
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+			universalReturnValue = null;
+		});
+}
+
+function getProfilesLeakMicroLeakDetection(ProfileNumber){
+	// Profil Micro Leak Detection PMx
+	axios.get(prepareGetRequest("PM" + String(ProfileNumber)))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			switch(ProfileNumber)
+			{
+				case 1:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Micro Leac Detection = " + String(response.data.getPM1));
+					universalReturnValue = response.data.getPM1;
+					break;
+				case 2:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Micro Leac Detection = " + String(response.data.getPM2));
+					universalReturnValue = response.data.getPM2;
+					break;
+				case 3:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Micro Leac Detection = " + String(response.data.getPM3));
+					universalReturnValue = response.data.getPM3;
+					break;
+				case 4:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Micro Leac Detection = " + String(response.data.getPM4));
+					universalReturnValue = response.data.getPM4;
+					break;
+				case 5:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Micro Leac Detection = " + String(response.data.getPM5));
+					universalReturnValue = response.data.getPM5;
+					break;
+				case 6:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Micro Leac Detection = " + String(response.data.getPM6));
+					universalReturnValue = response.data.getPM6;
+					break;
+				case 7:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Micro Leac Detection = " + String(response.data.getPM7));
+					universalReturnValue = response.data.getPM7;
+					break;
+				case 8:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Micro Leac Detection = " + String(response.data.getPM8));
+					universalReturnValue = response.data.getPM8;
 					break;
 				default:
 					universalReturnValue = null;
