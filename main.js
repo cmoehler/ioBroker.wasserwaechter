@@ -13,11 +13,15 @@ const { resolve } = require("path");
 const { resourceLimits } = require("worker_threads");
 
 const axios = require("axios");
+const { stringify } = require("querystring");
 
 let Intervall_ID;
 
+let existingProfiles = 0;
+
 //Reference to my own adapter
 let myAdapter;
+
 
 // Load your modules here, e.g.:
 // const fs = require("fs");
@@ -191,6 +195,20 @@ class Wasserwaechter extends utils.Adapter {
 		});
 
 
+		// Profile
+
+		await this.setObjectNotExistsAsync("Profiles.Existing", {
+			type: "state",
+			common: {
+				name: "Existing Profiles",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 
 
 		// In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
@@ -204,6 +222,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Consumptions.LastVolume");
 		this.subscribeStates("Consumptions.TotalVolume");
 		this.subscribeStates("Consumptions.CurrentVolume");
+		this.subscribeStates("Profiles.Existing");
 
 		// Settings in Objekte schreiben
 		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
@@ -342,6 +361,38 @@ function pollData(){
 	setTimeout(getBatterieVoltage, 3 * delayTimeMS);
 	setTimeout(getAlarm, 4 * delayTimeMS);
 	setTimeout(getStopValve, 5 * delayTimeMS);
+	setTimeout(getNumProfiles, 6 * delayTimeMS);
+	setTimeout(getProfileDetails, 10 * delayTimeMS);
+}
+
+function getProfileDetails(){
+	for (let i = 0; i < existingProfiles; i++){
+		myAdapter.setObjectNotExistsAsync("Profiles." + String(i + 1) +".Name", {
+			type: "state",
+			common: {
+				name: "Profil Name",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+	}
+}
+
+function getNumProfiles(){
+	// Anzahl Profile PRN
+	axios.get(prepareGetRequest("PRN"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Vorhandene Profile = " + response.data.getPRN + " Stück");
+			myAdapter.setStateAsync("Profiles.Existing", { val: response.data.getPRN, ack: true });
+			existingProfiles = parseFloat(response.data.getPRN);
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
 }
 
 function getStopValve(){
