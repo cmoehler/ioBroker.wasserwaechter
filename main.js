@@ -255,6 +255,9 @@ class Wasserwaechter extends utils.Adapter {
 		result = await this.checkGroupAsync("admin", "admin");
 		this.log.info("check group user admin group admin: " + result);
 
+		// Profile erforschen
+		await initProfiles();
+
 		// Timer für das Polling starten
 		Intervall_ID = setInterval(pollData, parseInt(this.config.device_poll_interval) * 1000);
 
@@ -354,18 +357,30 @@ function prepareGetRequest(command){
 	return "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + command;
 }
 
+async function initProfiles(){
+
+	await sleep(1000);
+}
+
 async function pollData(){
 
-	myAdapter.log.info("trigger erhalten");
+	myAdapter.log.info("poll trigger erhalten");
 	const delayTimeMS = 1000;
-	myAdapter.log.info("1000ms warten");
-	await sleep(1000);
-	myAdapter.log.info("1000ms vorbei");
-	myAdapter.log.info("1000ms warten");
-	await sleep(1000);
-	myAdapter.log.info("1000ms vorbei");
 
 	// Zustandsdaten abrufen
+	getTotalWaterVolume();
+	await sleep(delayTimeMS);
+	getLastWaterVolume();
+	await sleep(delayTimeMS);
+	currentWaterVolume();
+	await sleep(delayTimeMS);
+	getAlarm();
+	await sleep(delayTimeMS);
+	getStopValve();
+	await sleep(delayTimeMS);
+	getNumProfiles();
+
+	/**
 	setTimeout(getTotalWaterVolume, 0 * delayTimeMS);
 	setTimeout(getLastWaterVolume, 1 * delayTimeMS);
 	setTimeout(currentWaterVolume, 2 * delayTimeMS);
@@ -374,6 +389,7 @@ async function pollData(){
 	setTimeout(getStopValve, 5 * delayTimeMS);
 	setTimeout(getNumProfiles, 6 * delayTimeMS);
 	setTimeout(getProfileDetails, 10 * delayTimeMS);
+	 */
 }
 
 function getProfileDetails(){
