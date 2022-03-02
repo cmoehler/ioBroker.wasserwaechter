@@ -362,13 +362,16 @@ async function initProfiles(){
 
 	// aktive Profile ermitteln
 	const ActiveProfiles = getNumActiveProfiles();
-	await sleep(1000);
 	myAdapter.setStateAsync("Profiles.Active", { val: ActiveProfiles, ack: true });
+	await sleep(1000);
+	myAdapter.log.info("Aktive Projekte = " + String(ActiveProfiles));
 
 	for(let i = 1; i < 9; i++)
 	{
-		myAdapter.log.info("i in for/next = " + String(i));
-		if(String(getProfilesStatus(i)) == "1")
+		const CurrentProjectStatus = getProfilesStatus(i);
+		await sleep(1000);
+		myAdapter.log.info("i in for/next = " + String(CurrentProjectStatus));
+		if(String(CurrentProjectStatus) == "1")
 		{
 			myAdapter.log.info("Profil " + String(i) + " ist aktiv");
 		}
@@ -376,7 +379,6 @@ async function initProfiles(){
 		{
 			myAdapter.log.info("Profil " + String(i) + " ist inaktiv");
 		}
-		await sleep(1000);
 	}
 
 }
@@ -396,6 +398,8 @@ async function pollData(){
 	getAlarm();
 	await sleep(delayTimeMS);
 	getStopValve();
+	await sleep(delayTimeMS);
+	getBatterieVoltage();
 
 	/**
 	setTimeout(getTotalWaterVolume, 0 * delayTimeMS);
@@ -409,7 +413,7 @@ async function pollData(){
 	 */
 }
 
-function getProfileDetails(){
+function getProfileDetails(existingProfiles){
 	for (let i = 0; i < existingProfiles; i++){
 		myAdapter.setObjectNotExistsAsync("Profiles." + String(i + 1) +".Name", {
 			type: "state",
@@ -472,7 +476,7 @@ function getNumActiveProfiles(){
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Aktive Profile = " + response.data.getPRN + " Stück");
-			return parseFloat(response.data.getPRN);
+			return response.data.getPRN;
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
