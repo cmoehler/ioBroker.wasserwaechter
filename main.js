@@ -211,7 +211,7 @@ class Wasserwaechter extends utils.Adapter {
 		// Die Objekte für die 8 Profile erstellen
 		for (let i = 1; i < 9; i++){
 			// Profil Name
-			myAdapter.setObjectNotExistsAsync("Profiles." + String(i) +".Name", {
+			await myAdapter.setObjectNotExistsAsync("Profiles." + String(i) +".Name", {
 				type: "state",
 				common: {
 					name: "Profil Name",
@@ -224,7 +224,7 @@ class Wasserwaechter extends utils.Adapter {
 			});
 
 			// Profil Aktiv
-			myAdapter.setObjectNotExistsAsync("Profiles." + String(i) +".Aktiv", {
+			await myAdapter.setObjectNotExistsAsync("Profiles." + String(i) +".Aktiv", {
 				type: "state",
 				common: {
 					name: "Profil Aktiv",
