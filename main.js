@@ -264,6 +264,20 @@ class Wasserwaechter extends utils.Adapter {
 				native: {},
 			});
 
+			// Profil MaxFlow Leckage
+			await this.setObjectNotExistsAsync("Profiles." + String(i) + ".LeakMaxFlow", {
+				type: "state",
+				common: {
+					name: "Profil Max Flow L/h Leak",
+					type: "string",
+					role: "indicator",
+					unit: "L/h",
+					read: true,
+					write: true,
+				},
+				native: {},
+			});
+
 		}
 
 
@@ -286,6 +300,7 @@ class Wasserwaechter extends utils.Adapter {
 			this.subscribeStates("Profiles." + String(i) +".Aktiv");
 			this.subscribeStates("Profiles." + String(i) +".LeakVolume");
 			this.subscribeStates("Profiles." + String(i) +".LeakTime");
+			this.subscribeStates("Profiles." + String(i) +".LeakMaxFlow");
 		}
 
 		// Settings in Objekte schreiben
@@ -324,9 +339,11 @@ class Wasserwaechter extends utils.Adapter {
 		// Profile erforschen
 		initProfiles();
 
+		// Warten bis initialisierung abgeschlossen ist
+		await sleep(60000);
+
 		// Timer für das Polling starten
 		Intervall_ID = setInterval(pollData, parseInt(this.config.device_poll_interval) * 1000);
-
 	}
 
 	/**
@@ -480,6 +497,18 @@ async function initProfiles(){
 				myAdapter.log.info("Profil " + String(i) + " Leak Time: " + String(universalReturnValue) + " min");
 				myAdapter.setStateAsync("Profiles." + String(i) +".LeakTime", { val: String(universalReturnValue), ack: true });
 			}
+
+			// Leckage Max Flow L/h
+			getProfilesLeakMaxFlow(i);
+			await sleep(1000);
+			if(String(universalReturnValue) == "0")
+			{
+				myAdapter.log.info("Profil " + String(i) + " Leak Max Flow: disabled");
+				myAdapter.setStateAsync("Profiles." + String(i) +".LeakMaxFlow", { val: "disabled", ack: true });
+			}else{
+				myAdapter.log.info("Profil " + String(i) + " Max Flow: " + String(universalReturnValue) + " L/h");
+				myAdapter.setStateAsync("Profiles." + String(i) +".LeakMaxFlow", { val: String(universalReturnValue), ack: true });
+			}
 		}
 
 	}else{
@@ -505,17 +534,6 @@ async function pollData(){
 	getStopValve();
 	await sleep(delayTimeMS);
 	getBatterieVoltage();
-
-	/**
-	setTimeout(getTotalWaterVolume, 0 * delayTimeMS);
-	setTimeout(getLastWaterVolume, 1 * delayTimeMS);
-	setTimeout(currentWaterVolume, 2 * delayTimeMS);
-	setTimeout(getBatterieVoltage, 3 * delayTimeMS);
-	setTimeout(getAlarm, 4 * delayTimeMS);
-	setTimeout(getStopValve, 5 * delayTimeMS);
-	setTimeout(getNumProfiles, 6 * delayTimeMS);
-	setTimeout(getProfileDetails, 10 * delayTimeMS);
-	 */
 }
 
 
@@ -704,6 +722,55 @@ function getProfilesLeakTime(ProfileNumber){
 				case 8:
 					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Time = " + String(response.data.getPT8));
 					universalReturnValue = response.data.getPT8;
+					break;
+				default:
+					universalReturnValue = null;
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+			universalReturnValue = null;
+		});
+}
+
+function getProfilesLeakMaxFlow(ProfileNumber){
+	// Profil Max Flow l/h Leckage ermitteln PFx
+	axios.get(prepareGetRequest("PF" + String(ProfileNumber)))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			switch(ProfileNumber)
+			{
+				case 1:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Max Flow = " + String(response.data.getPF1));
+					universalReturnValue = response.data.getPF1;
+					break;
+				case 2:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Max Flow = " + String(response.data.getPF2));
+					universalReturnValue = response.data.getPF2;
+					break;
+				case 3:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Max Flow = " + String(response.data.getPF3));
+					universalReturnValue = response.data.getPF3;
+					break;
+				case 4:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Max Flow = " + String(response.data.getPF4));
+					universalReturnValue = response.data.getPF4;
+					break;
+				case 5:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Max Flow = " + String(response.data.getPF5));
+					universalReturnValue = response.data.getPF5;
+					break;
+				case 6:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Max Flow = " + String(response.data.getPF6));
+					universalReturnValue = response.data.getPF6;
+					break;
+				case 7:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Max Flow = " + String(response.data.getPF7));
+					universalReturnValue = response.data.getPF7;
+					break;
+				case 8:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leak Max Flow = " + String(response.data.getPF8));
+					universalReturnValue = response.data.getPF8;
 					break;
 				default:
 					universalReturnValue = null;
