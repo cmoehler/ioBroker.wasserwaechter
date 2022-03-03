@@ -54,6 +54,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.log.info("Device Units: " + this.config.device_units);
 		this.log.info("Max Flow Leakage Time: " + this.config.device_maxflowleakagetime);
 		this.log.info("Micro Leakage Test: " + this.config.device_microleakagetest);
+		this.log.info("Micro Leakage Test Period: " + this.config.device_microleakagetestperiod);
 
 
 		this.log.info("Device Network Address: " + this.config.device_network_ip);
@@ -166,6 +167,18 @@ class Wasserwaechter extends utils.Adapter {
 			type: "state",
 			common: {
 				name: "Micro Leakage Test",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+		await this.setObjectNotExistsAsync("Settings.MicroLeakageTestPeriod", {
+			type: "state",
+			common: {
+				name: "Micro Leakage Test Period",
 				type: "string",
 				role: "indicator",
 				read: true,
@@ -450,6 +463,7 @@ class Wasserwaechter extends utils.Adapter {
 		await this.setStateAsync("Settings.Units", { val: this.config.device_units, ack: true });
 		await this.setStateAsync("Settings.MaxFlowLeakageTime", { val: this.config.device_maxflowleakagetime, ack: true });
 		await this.setStateAsync("Settings.MicroLeakageTest", { val: this.config.device_microleakagetest, ack: true });
+		await this.setStateAsync("Settings.MicroLeakageTestPeriod", { val: this.config.device_microleakagetestperiod, ack: true });
 
 
 		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
@@ -606,6 +620,8 @@ async function initSettings(){
 	getMaxFlowLeakageTime();
 	await sleep(delayTimeMS);
 	getMicroLeakageTest();
+	await sleep(delayTimeMS);
+	getMicroLeakageTestPeriod();
 	await sleep(delayTimeMS);
 }
 
@@ -1497,6 +1513,42 @@ function getMicroLeakageTest(){
 					default:
 						// undefiniert
 						myAdapter.setStateAsync("Settings.MicroLeakageTest", { val: "undefined", ack: true });
+				}
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getMicroLeakageTestPeriod(){
+	// Micro Leakage Test Period DRP
+	axios.get(prepareGetRequest("DRP"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			if(response.data.getDRP != null){
+				myAdapter.log.info("Micro Leakage Test Period = " + String(response.data.getDRP));
+				switch(String(response.data.getDRP).substring(0,1))
+				{
+					case "0":
+						// always
+						myAdapter.setStateAsync("Settings.MicroLeakageTestPeriod", { val: "always", ack: true });
+						break;
+					case "1":
+						// day
+						myAdapter.setStateAsync("Settings.MicroLeakageTestPeriod", { val: "day", ack: true });
+						break;
+					case "2":
+						// week
+						myAdapter.setStateAsync("Settings.MicroLeakageTestPeriod", { val: "week", ack: true });
+						break;
+					case "3":
+						// month
+						myAdapter.setStateAsync("Settings.MicroLeakageTestPeriod", { val: "month", ack: true });
+						break;
+					default:
+						// undefiniert
+						myAdapter.setStateAsync("Settings.MicroLeakageTestPeriod", { val: "undefined", ack: true });
 				}
 			}
 		})
