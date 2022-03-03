@@ -75,7 +75,8 @@
 		"device_network_port": "5333",
 		"device_poll_interval": "30",
 		"device_language": "0",
-		"device_units": "0"
+		"device_units": "0",
+		"device_maxflowleakagetime": "1"
 	},
 	"objects": [],
 	"instanceObjects": []
