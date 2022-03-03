@@ -8,7 +8,7 @@
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
 const { rejects } = require("assert");
-const { request } = require("http");
+const { request, get } = require("http");
 const { resolve } = require("path");
 const { resourceLimits } = require("worker_threads");
 
@@ -51,6 +51,7 @@ class Wasserwaechter extends utils.Adapter {
 		// The adapters config (in the instance object everything under the attribute "native") is accessible via
 		// this.config:
 		this.log.info("Device Language: " + this.config.device_language);
+		this.log.info("Device Units: " + this.config.device_units);
 		this.log.info("Device Network Address: " + this.config.device_network_ip);
 		this.log.info("Device Network Port: " + this.config.device_network_port);
 		this.log.info("Device Polling Intervall in seconds: " + this.config.device_poll_interval);
@@ -124,6 +125,18 @@ class Wasserwaechter extends utils.Adapter {
 			type: "state",
 			common: {
 				name: "Device Language",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+		await this.setObjectNotExistsAsync("Settings.Units", {
+			type: "state",
+			common: {
+				name: "Device Units",
 				type: "string",
 				role: "indicator",
 				read: true,
@@ -405,6 +418,7 @@ class Wasserwaechter extends utils.Adapter {
 
 		// Settings in Objekte schreiben
 		await this.setStateAsync("Settings.Language", { val: this.config.device_language, ack: true });
+		await this.setStateAsync("Settings.Units", { val: this.config.device_units, ack: true });
 		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
 		await this.setStateAsync("Settings.Port", { val: this.config.device_network_port, ack: true });
 		await this.setStateAsync("Settings.PollingInterval", { val: this.config.device_poll_interval, ack: true });
@@ -552,6 +566,8 @@ async function initSettings(){
 
 	// Spracheinstellung auslesen
 	getLanguage();
+	await sleep(delayTimeMS);
+	getUnits();
 	await sleep(delayTimeMS);
 }
 
@@ -1368,6 +1384,34 @@ function getLanguage(){
 					default:
 						// undefiniert
 						myAdapter.setStateAsync("Settings.Language", { val: "undefined", ack: true });
+				}
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getUnits(){
+	// Einheiten Einstellung auslesen UNI
+	axios.get(prepareGetRequest("UNI"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			if(response.data.getUNI != null){
+				myAdapter.log.info("Language = " + String(response.data.getUNI));
+				switch(String(response.data.getLNG).substring(0,1))
+				{
+					case "0":
+						// German
+						myAdapter.setStateAsync("Settings.Units", { val: "°C/bar/Liter", ack: true });
+						break;
+					case "1":
+						// English
+						myAdapter.setStateAsync("Settings.Units", { val: "°F/psi/US.liq.gal", ack: true });
+						break;
+					default:
+						// undefiniert
+						myAdapter.setStateAsync("Settings.Units", { val: "undefined", ack: true });
 				}
 			}
 		})
