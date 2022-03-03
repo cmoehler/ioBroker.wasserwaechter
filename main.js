@@ -55,6 +55,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.log.info("Max Flow Leakage Time: " + this.config.device_maxflowleakagetime);
 		this.log.info("Micro Leakage Test: " + this.config.device_microleakagetest);
 		this.log.info("Micro Leakage Test Period: " + this.config.device_microleakagetestperiod);
+		this.log.info("Buzzer On Alarm: " + this.config.device_buzzeronalarm);
 
 
 		this.log.info("Device Network Address: " + this.config.device_network_ip);
@@ -179,6 +180,18 @@ class Wasserwaechter extends utils.Adapter {
 			type: "state",
 			common: {
 				name: "Micro Leakage Test Period",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+		await this.setObjectNotExistsAsync("Settings.BuzzerOnAlarm", {
+			type: "state",
+			common: {
+				name: "Buzzer On Alarm",
 				type: "string",
 				role: "indicator",
 				read: true,
@@ -464,6 +477,7 @@ class Wasserwaechter extends utils.Adapter {
 		await this.setStateAsync("Settings.MaxFlowLeakageTime", { val: this.config.device_maxflowleakagetime, ack: true });
 		await this.setStateAsync("Settings.MicroLeakageTest", { val: this.config.device_microleakagetest, ack: true });
 		await this.setStateAsync("Settings.MicroLeakageTestPeriod", { val: this.config.device_microleakagetestperiod, ack: true });
+		await this.setStateAsync("Settings.BuzzerOnAlarm", { val: this.config.device_buzzeronalarm, ack: true });
 
 
 		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
@@ -622,6 +636,8 @@ async function initSettings(){
 	getMicroLeakageTest();
 	await sleep(delayTimeMS);
 	getMicroLeakageTestPeriod();
+	await sleep(delayTimeMS);
+	getBuzzerOnAlarm();
 	await sleep(delayTimeMS);
 }
 
@@ -1549,6 +1565,34 @@ function getMicroLeakageTestPeriod(){
 					default:
 						// undefiniert
 						myAdapter.setStateAsync("Settings.MicroLeakageTestPeriod", { val: "undefined", ack: true });
+				}
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getBuzzerOnAlarm(){
+	// Buzzer On Alarm BUZ
+	axios.get(prepareGetRequest("BUZ"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			if(response.data.getBUZ != null){
+				myAdapter.log.info("Buzzer On Alarm = " + String(response.data.getBUZ));
+				switch(String(response.data.getBUZ).substring(0,1))
+				{
+					case "0":
+						// always
+						myAdapter.setStateAsync("Settings.BuzzerOnAlarm", { val: "disabled", ack: true });
+						break;
+					case "1":
+						// day
+						myAdapter.setStateAsync("Settings.BuzzerOnAlarm", { val: "enabled", ack: true });
+						break;
+					default:
+						// undefiniert
+						myAdapter.setStateAsync("Settings.BuzzerOnAlarm", { val: "undefined", ack: true });
 				}
 			}
 		})
