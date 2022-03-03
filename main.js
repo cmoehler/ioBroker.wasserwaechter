@@ -1341,7 +1341,32 @@ function getLanguage(){
 			myAdapter.log.info(JSON.stringify(response.data));
 			if(response.data.getLNG != null){
 				myAdapter.log.info("Language = " + String(response.data.getLNG));
-				myAdapter.setStateAsync("Settings.Language", { val: String(response.data.getLNG), ack: true });
+				switch(String(response.data.getLNG).substring(0,1))
+				{
+					case "0":
+						// German
+						myAdapter.setStateAsync("Settings.Language", { val: "German", ack: true });
+						break;
+					case "1":
+						// English
+						myAdapter.setStateAsync("Settings.Language", { val: "English", ack: true });
+						break;
+					case "2":
+						// Spanish
+						myAdapter.setStateAsync("Settings.Language", { val: "Spanish", ack: true });
+						break;
+					case "3":
+						// Italian
+						myAdapter.setStateAsync("Settings.Language", { val: "Italian", ack: true });
+						break;
+					case "4":
+						// Polish
+						myAdapter.setStateAsync("Settings.Language", { val: "Polish", ack: true });
+						break;
+					default:
+						// undefiniert
+						myAdapter.setStateAsync("Settings.Language", { val: "undefined", ack: true });
+				}
 			}
 		})
 		.catch(function(error){
