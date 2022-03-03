@@ -317,6 +317,19 @@ class Wasserwaechter extends utils.Adapter {
 				},
 				native: {},
 			});
+
+			// Profil Leak Warning
+			await this.setObjectNotExistsAsync("Profiles." + String(i) + ".LeakageWarning", {
+				type: "state",
+				common: {
+					name: "Profil Leakage Warning",
+					type: "string",
+					role: "indicator",
+					read: true,
+					write: true,
+				},
+				native: {},
+			});
 		}
 
 
@@ -343,6 +356,7 @@ class Wasserwaechter extends utils.Adapter {
 			this.subscribeStates("Profiles." + String(i) +".LeakMicroLeakDetection");
 			this.subscribeStates("Profiles." + String(i) +".ReturnTimeToStandardProfile");
 			this.subscribeStates("Profiles." + String(i) +".Buzzer");
+			this.subscribeStates("Profiles." + String(i) +".LeakageWarning");
 		}
 
 		// Settings in Objekte schreiben
@@ -587,6 +601,18 @@ async function initProfiles(){
 			}else{
 				myAdapter.log.info("Profil " + String(i) + " Buzzer: on");
 				myAdapter.setStateAsync("Profiles." + String(i) +".Buzzer", { val: "on", ack: true });
+			}
+
+			// Profile Leakage Warning
+			getProfileLeakageWarning(i);
+			await sleep(1000);
+			if(String(universalReturnValue) == "0")
+			{
+				myAdapter.log.info("Profil " + String(i) + " Leakage Warning: off");
+				myAdapter.setStateAsync("Profiles." + String(i) +".LeakageWarning", { val: "off", ack: true });
+			}else{
+				myAdapter.log.info("Profil " + String(i) + " Leakage Warning: on");
+				myAdapter.setStateAsync("Profiles." + String(i) +".LeakageWarning", { val: "on", ack: true });
 			}
 
 		}
@@ -1007,8 +1033,58 @@ function getProfileBuzzer(ProfileNumber){
 			myAdapter.log.error(error);
 			universalReturnValue = null;
 		});
+
 }
 
+function getProfileLeakageWarning(ProfileNumber){
+	// Profil Leakage Warning PWx
+	axios.get(prepareGetRequest("PW" + String(ProfileNumber)))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			switch(ProfileNumber)
+			{
+				case 1:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leakage Warning = " + String(response.data.getPW1));
+					universalReturnValue = response.data.getPW1;
+					break;
+				case 2:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leakage Warning = " + String(response.data.getPW2));
+					universalReturnValue = response.data.getPW2;
+					break;
+				case 3:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leakage Warning = " + String(response.data.getPW3));
+					universalReturnValue = response.data.getPW3;
+					break;
+				case 4:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leakage Warning = " + String(response.data.getPW4));
+					universalReturnValue = response.data.getPW4;
+					break;
+				case 5:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leakage Warning = " + String(response.data.getPW5));
+					universalReturnValue = response.data.getPW5;
+					break;
+				case 6:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leakage Warning = " + String(response.data.getPW6));
+					universalReturnValue = response.data.getPW6;
+					break;
+				case 7:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leakage Warning = " + String(response.data.getPW7));
+					universalReturnValue = response.data.getPW7;
+					break;
+				case 8:
+					myAdapter.log.info("Profile " + String(ProfileNumber) + " Leakage Warning = " + String(response.data.getPW8));
+					universalReturnValue = response.data.getPW8;
+					break;
+				default:
+					universalReturnValue = null;
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+			universalReturnValue = null;
+		});
+
+}
 function getNumActiveProfiles(){
 	// Anzahl Profile PRN
 	axios.get(prepareGetRequest("PRN"))
