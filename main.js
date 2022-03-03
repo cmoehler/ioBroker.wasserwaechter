@@ -53,6 +53,9 @@ class Wasserwaechter extends utils.Adapter {
 		this.log.info("Device Language: " + this.config.device_language);
 		this.log.info("Device Units: " + this.config.device_units);
 		this.log.info("Max Flow Leakage Time: " + this.config.device_maxflowleakagetime);
+		this.log.info("Micro Leakage Test: " + this.config.device_microleakagetest);
+
+
 		this.log.info("Device Network Address: " + this.config.device_network_ip);
 		this.log.info("Device Network Port: " + this.config.device_network_port);
 		this.log.info("Device Polling Intervall in seconds: " + this.config.device_poll_interval);
@@ -153,6 +156,18 @@ class Wasserwaechter extends utils.Adapter {
 				type: "string",
 				role: "indicator",
 				unit: "min",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+		await this.setObjectNotExistsAsync("Settings.MicroLeakageTest", {
+			type: "state",
+			common: {
+				name: "Micro Leakage Test",
+				type: "string",
+				role: "indicator",
 				read: true,
 				write: true,
 			},
@@ -434,6 +449,9 @@ class Wasserwaechter extends utils.Adapter {
 		await this.setStateAsync("Settings.Language", { val: this.config.device_language, ack: true });
 		await this.setStateAsync("Settings.Units", { val: this.config.device_units, ack: true });
 		await this.setStateAsync("Settings.MaxFlowLeakageTime", { val: this.config.device_maxflowleakagetime, ack: true });
+		await this.setStateAsync("Settings.MicroLeakageTest", { val: this.config.device_microleakagetest, ack: true });
+
+
 		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
 		await this.setStateAsync("Settings.Port", { val: this.config.device_network_port, ack: true });
 		await this.setStateAsync("Settings.PollingInterval", { val: this.config.device_poll_interval, ack: true });
@@ -586,6 +604,8 @@ async function initSettings(){
 	getUnits();
 	await sleep(delayTimeMS);
 	getMaxFlowLeakageTime();
+	await sleep(delayTimeMS);
+	getMicroLeakageTest();
 	await sleep(delayTimeMS);
 }
 
@@ -1420,11 +1440,11 @@ function getUnits(){
 				switch(String(response.data.getUNI).substring(0,1))
 				{
 					case "0":
-						// German
+						// Dezimal: °C/bar/Liter
 						myAdapter.setStateAsync("Settings.Units", { val: "°C/bar/Liter", ack: true });
 						break;
 					case "1":
-						// English
+						// Imperial: °F/psi/US.liq.gal
 						myAdapter.setStateAsync("Settings.Units", { val: "°F/psi/US.liq.gal", ack: true });
 						break;
 					default:
@@ -1446,6 +1466,38 @@ function getMaxFlowLeakageTime(){
 			if(response.data.getT2 != null){
 				myAdapter.log.info("Max Flow Leakage Time = " + String(response.data.getT2) + " min");
 				myAdapter.setStateAsync("Settings.MaxFlowLeakageTime", { val: String(response.data.getT2), ack: true });
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getMicroLeakageTest(){
+	// Micro Leakage Test DMA
+	axios.get(prepareGetRequest("DMA"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			if(response.data.getDMA != null){
+				myAdapter.log.info("Micro Leakage Test = " + String(response.data.getDMA));
+				switch(String(response.data.getDMA).substring(0,1))
+				{
+					case "0":
+						// disabled
+						myAdapter.setStateAsync("Settings.MicroLeakageTest", { val: "disabled", ack: true });
+						break;
+					case "1":
+						// warning
+						myAdapter.setStateAsync("Settings.MicroLeakageTest", { val: "warning", ack: true });
+						break;
+					case "2":
+						// shutoff
+						myAdapter.setStateAsync("Settings.MicroLeakageTest", { val: "shutoff", ack: true });
+						break;
+					default:
+						// undefiniert
+						myAdapter.setStateAsync("Settings.MicroLeakageTest", { val: "undefined", ack: true });
+				}
 			}
 		})
 		.catch(function(error){

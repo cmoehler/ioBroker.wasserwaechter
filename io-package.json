@@ -76,7 +76,8 @@
 		"device_poll_interval": "30",
 		"device_language": "0",
 		"device_units": "0",
-		"device_maxflowleakagetime": "1"
+		"device_maxflowleakagetime": "1",
+		"device_microleakagetest": "1"
 	},
 	"objects": [],
 	"instanceObjects": []
