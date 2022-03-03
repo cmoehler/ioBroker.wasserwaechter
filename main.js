@@ -50,6 +50,7 @@ class Wasserwaechter extends utils.Adapter {
 
 		// The adapters config (in the instance object everything under the attribute "native") is accessible via
 		// this.config:
+		this.log.info("Device Language: " + this.config.device_language);
 		this.log.info("Device Network Address: " + this.config.device_network_ip);
 		this.log.info("Device Network Port: " + this.config.device_network_port);
 		this.log.info("Device Polling Intervall in seconds: " + this.config.device_poll_interval);
@@ -403,6 +404,7 @@ class Wasserwaechter extends utils.Adapter {
 		}
 
 		// Settings in Objekte schreiben
+		await this.setStateAsync("Settings.Language", { val: this.config.device_language, ack: true });
 		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
 		await this.setStateAsync("Settings.Port", { val: this.config.device_network_port, ack: true });
 		await this.setStateAsync("Settings.PollingInterval", { val: this.config.device_poll_interval, ack: true });
