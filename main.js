@@ -57,6 +57,10 @@ class Wasserwaechter extends utils.Adapter {
 		this.log.info("Micro Leakage Test Period: " + this.config.device_microleakagetestperiod);
 		this.log.info("Buzzer On Alarm: " + this.config.device_buzzeronalarm);
 
+		this.log.info("Conductivity Sensor installed: " + this.config.device_conductivitysensorinstalled);
+		this.log.info("Conductivity Limit: " + this.config.device_conductivitylimit);
+
+
 
 		this.log.info("Device Network Address: " + this.config.device_network_ip);
 		this.log.info("Device Network Port: " + this.config.device_network_port);
@@ -200,6 +204,30 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		await this.setObjectNotExistsAsync("Settings.ConductivitySensorInstalled", {
+			type: "state",
+			common: {
+				name: "Conductivity Sensor Installed",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+		await this.setObjectNotExistsAsync("Settings.ConductivityLimit", {
+			type: "state",
+			common: {
+				name: "Conductivity Limit",
+				type: "string",
+				role: "indicator",
+				unit: "uS/cm",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
 		// ===============================================================
 		// Condition States
 		// ===============================================================
@@ -479,6 +507,12 @@ class Wasserwaechter extends utils.Adapter {
 		await this.setStateAsync("Settings.MicroLeakageTestPeriod", { val: this.config.device_microleakagetestperiod, ack: true });
 		await this.setStateAsync("Settings.BuzzerOnAlarm", { val: this.config.device_buzzeronalarm, ack: true });
 
+		if(this.config.device_conductivitysensorinstalled){
+			await this.setStateAsync("Settings.ConductivitySensorInstalled", { val: "installed", ack: true });
+		}else{
+			await this.setStateAsync("Settings.ConductivitySensorInstalled", { val: "not installed", ack: true });
+		}
+		await this.setStateAsync("Settings.ConductivityLimit", { val: this.config.device_conductivitylimit, ack: true });
 
 		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
 		await this.setStateAsync("Settings.Port", { val: this.config.device_network_port, ack: true });
@@ -639,6 +673,8 @@ async function initSettings(){
 	await sleep(delayTimeMS);
 	getBuzzerOnAlarm();
 	await sleep(delayTimeMS);
+	getConductivityLimit();
+	await sleep(delayTimeMS);
 }
 
 async function initProfiles(){
@@ -788,6 +824,12 @@ async function pollData(){
 	getBatterieVoltage();
 	await sleep(delayTimeMS);
 	getLeakageProtectionTemporaryDeactivation();
+	await sleep(delayTimeMS);
+	if(myAdapter.config.device_conductivitysensorinstalled == true){
+		// Leitfähigkeit auslesen
+		await sleep(delayTimeMS);
+	}
+
 }
 
 function getProfilesStatus(ProfileNumber){
@@ -1601,3 +1643,20 @@ function getBuzzerOnAlarm(){
 		});
 }
 
+function getConductivityLimit(){
+	// Conductivity Limit CNL
+	axios.get(prepareGetRequest("CNL"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			if(response.data.getCNL === "0"){
+				myAdapter.log.info("Conductivity Limit = disabled");
+				myAdapter.setStateAsync("Settings.ConductivityLimit", { val: "disabled", ack: true });
+			}else{
+				myAdapter.log.info("Leakage Protection Temporary Deactivation = " + String(response.data.getCNL) + " uS/cm");
+				myAdapter.setStateAsync("Settings.ConductivityLimit", { val: response.data.getCNL, ack: true });
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
