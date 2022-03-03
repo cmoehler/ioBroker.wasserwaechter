@@ -73,7 +73,10 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+
+		// ===============================================================
 		// Device States
+		// ===============================================================
 		await this.setObjectNotExistsAsync("Settings.IP", {
 			type: "state",
 			common: {
@@ -113,7 +116,24 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		// ===============================================================
+		// User Settings
+		// ===============================================================
+		await this.setObjectNotExistsAsync("Settings.Language", {
+			type: "state",
+			common: {
+				name: "Device Language",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+		// ===============================================================
 		// Condition States
+		// ===============================================================
 
 		await this.setObjectNotExistsAsync("Conditions.BatteryVoltage", {
 			type: "state",
@@ -355,6 +375,8 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Settings.IP");
 		this.subscribeStates("Settings.Port");
 		this.subscribeStates("Settings.PollingInterval");
+		this.subscribeStates("Settings.Language");
+
 		this.subscribeStates("Conditions.BatteryVoltage");
 		this.subscribeStates("Conditions.StopValve");
 		this.subscribeStates("Conditions.Alarm");
@@ -413,11 +435,17 @@ class Wasserwaechter extends utils.Adapter {
 
 		myAdapter = this;
 
-		// Profile erforschen
+		// User Einstellungen auslesen
+		initSettings();
+
+		// Warten bis auslesen der Settings abgeschlossen ist
+		await sleep(10000);
+
+		// Profil Einstellungen auslesen
 		initProfiles();
 
 		// Warten bis initialisierung abgeschlossen ist
-		await sleep(120000);
+		await sleep(100000);
 
 		// Timer für das Polling starten
 		Intervall_ID = setInterval(pollData, parseInt(this.config.device_poll_interval) * 1000);
@@ -514,6 +542,15 @@ function sleep(ms) {
 function prepareGetRequest(command){
 	// URL aus den Settings-Daten zusammenbauen
 	return "http://" + myAdapter.config.device_network_ip + ":" + myAdapter.config.device_network_port + "/safe-tec/get/" + command;
+}
+async function initSettings(){
+
+	myAdapter.log.info("reading out Settings ...");
+	const delayTimeMS = 1000;
+
+	// Spracheinstellung auslesen
+	getLanguage();
+	await sleep(delayTimeMS);
 }
 
 async function initProfiles(){
@@ -664,7 +701,6 @@ async function pollData(){
 	await sleep(delayTimeMS);
 	getLeakageProtectionTemporaryDeactivation();
 }
-
 
 function getProfilesStatus(ProfileNumber){
 	// Ermitteln ob Profil aktiv ist
@@ -1108,6 +1144,7 @@ function getProfileLeakageWarning(ProfileNumber){
 		});
 
 }
+
 function getNumActiveProfiles(){
 	// Anzahl Profile PRN
 	axios.get(prepareGetRequest("PRN"))
@@ -1290,6 +1327,21 @@ function getLeakageProtectionTemporaryDeactivation(){
 			}else{
 				myAdapter.log.info("Leakage Protection Temporary Deactivation = " + String(response.data.getTMP) + " s");
 				myAdapter.setStateAsync("Conditions.LeakageProtectionTemporaryDeactivation", { val: response.data.getTMP, ack: true });
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getLanguage(){
+	// Sracheinstellungen auslesen LNG
+	axios.get(prepareGetRequest("LNG"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			if(response.data.getLNG != null){
+				myAdapter.log.info("Language = " + String(response.data.getLNG));
+				myAdapter.setStateAsync("Settings.Language", { val: String(response.data.getLNG), ack: true });
 			}
 		})
 		.catch(function(error){
