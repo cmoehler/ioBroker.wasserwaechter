@@ -152,7 +152,24 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		// Leakage protection temporary deactivation
+		await this.setObjectNotExistsAsync("Conditions.LeakageProtectionTemporaryDeactivation", {
+			type: "state",
+			common: {
+				name: "Device Leakage Protection Temporary Deactivation",
+				type: "string",
+				role: "indicator",
+				unit: "s",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+
+		// ===============================================================
 		// Consumptions States
+		// ===============================================================
 
 		await this.setObjectNotExistsAsync("Consumptions.LastVolume", {
 			type: "state",
@@ -341,9 +358,13 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Conditions.BatteryVoltage");
 		this.subscribeStates("Conditions.StopValve");
 		this.subscribeStates("Conditions.Alarm");
+		this.subscribeStates("Conditions.LeakageProtectionTemporaryDeactivation");
+
+
 		this.subscribeStates("Consumptions.LastVolume");
 		this.subscribeStates("Consumptions.TotalVolume");
 		this.subscribeStates("Consumptions.CurrentVolume");
+
 		this.subscribeStates("Profiles.Active");
 
 		// Die 8Profil Events adoptieren
@@ -396,7 +417,7 @@ class Wasserwaechter extends utils.Adapter {
 		initProfiles();
 
 		// Warten bis initialisierung abgeschlossen ist
-		await sleep(60000);
+		await sleep(120000);
 
 		// Timer für das Polling starten
 		Intervall_ID = setInterval(pollData, parseInt(this.config.device_poll_interval) * 1000);
@@ -640,6 +661,8 @@ async function pollData(){
 	getStopValve();
 	await sleep(delayTimeMS);
 	getBatterieVoltage();
+	await sleep(delayTimeMS);
+	getLeakageProtectionTemporaryDeactivation();
 }
 
 
@@ -1249,6 +1272,24 @@ function getAlarm(){
 				default:
 					myAdapter.setStateAsync("Conditions.Alarm", { val: "undefined", ack: true });
 					myAdapter.log.info("Alarm: undefiniert");
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getLeakageProtectionTemporaryDeactivation(){
+	// Leakage Protection Temporary Deactivation TMP
+	axios.get(prepareGetRequest("TMP"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			if(response.data.getTMP === "0"){
+				myAdapter.log.info("Leakage Protection Temporary Deactivation = disabled");
+				myAdapter.setStateAsync("Conditions.LeakageProtectionTemporaryDeactivation", { val: "disabled", ack: true });
+			}else{
+				myAdapter.log.info("Leakage Protection Temporary Deactivation = " + String(response.data.getTMP) + " s");
+				myAdapter.setStateAsync("Conditions.LeakageProtectionTemporaryDeactivation", { val: response.data.getTMP, ack: true });
 			}
 		})
 		.catch(function(error){
