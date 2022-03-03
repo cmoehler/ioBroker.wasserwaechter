@@ -1416,7 +1416,7 @@ function getUnits(){
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			if(response.data.getUNI != null){
-				myAdapter.log.info("Language = " + String(response.data.getUNI));
+				myAdapter.log.info("Units = " + String(response.data.getUNI));
 				switch(String(response.data.getUNI).substring(0,1))
 				{
 					case "0":
