@@ -125,6 +125,29 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		await this.setObjectNotExistsAsync("Settings.TemperatureSensorInstalled", {
+			type: "state",
+			common: {
+				name: "Device Temperature Sensor is installed",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+		await this.setObjectNotExistsAsync("Settings.PressureSensorInstalled", {
+			type: "state",
+			common: {
+				name: "Device Pressure Sensor is installed",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 		await this.setObjectNotExistsAsync("Settings.ConductivitySensorInstalled", {
 			type: "state",
 			common: {
@@ -471,6 +494,8 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Settings.Port");
 		this.subscribeStates("Settings.PollingInterval");
 		this.subscribeStates("Settings.Language");
+		this.subscribeStates("Settings.TemperatureSensorInstalled");
+		this.subscribeStates("Settings.PressureSensorInstalled");
 		this.subscribeStates("Settings.ConductivitySensorInstalled");
 
 		this.subscribeStates("Conditions.BatteryVoltage");
@@ -505,13 +530,6 @@ class Wasserwaechter extends utils.Adapter {
 		await this.setStateAsync("Settings.MicroLeakageTest", { val: this.config.device_microleakagetest, ack: true });
 		await this.setStateAsync("Settings.MicroLeakageTestPeriod", { val: this.config.device_microleakagetestperiod, ack: true });
 		await this.setStateAsync("Settings.BuzzerOnAlarm", { val: this.config.device_buzzeronalarm, ack: true });
-
-		if(this.config.device_conductivitysensorinstalled){
-			await this.setStateAsync("Settings.ConductivitySensorInstalled", { val: "installed", ack: true });
-		}else{
-			await this.setStateAsync("Settings.ConductivitySensorInstalled", { val: "not installed", ack: true });
-		}
-		await this.setStateAsync("Settings.ConductivityLimit", { val: this.config.device_conductivitylimit, ack: true });
 
 		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
 		await this.setStateAsync("Settings.Port", { val: this.config.device_network_port, ack: true });
@@ -671,6 +689,25 @@ async function initSettings(){
 	await sleep(delayTimeMS);
 	getBuzzerOnAlarm();
 	await sleep(delayTimeMS);
+	// Temperatursensor
+	getTemperatureSensorInstalled();
+	if(universalReturnValue === true){
+		myAdapter.log.info("Init: Temperatursensor ist installiert");
+		await sleep(delayTimeMS);
+		// Drucksensor Limit auslesen
+	}else{
+		myAdapter.log.info("Init: Temperatursensor ist nicht installiert");
+	}
+	// Drucksensor
+	getPressureSensorInstalled();
+	if(universalReturnValue === true){
+		myAdapter.log.info("Init: Drucksensor ist installiert");
+		await sleep(delayTimeMS);
+		// Drucksensor Limit auslesen
+	}else{
+		myAdapter.log.info("Init: Drucksensor ist nicht installiert");
+	}
+	// Leitfähigkeitssensor
 	getConductionSensorInstalled();
 	if(universalReturnValue === true){
 		myAdapter.log.info("Init: Leitfähigkeitssensor ist installiert");
@@ -1652,8 +1689,48 @@ function getBuzzerOnAlarm(){
 		});
 }
 
+function getTemperatureSensorInstalled(){
+	// Temperature Sensor installed TSD
+	axios.get(prepareGetRequest("TSD"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			if(response.data.getTSD === "1"){
+				myAdapter.log.info("Temperature Sensor = not installed");
+				myAdapter.setStateAsync("Settings.TemperatureSensorInstalled", { val: "No", ack: true });
+				universalReturnValue = false;
+			}else{
+				myAdapter.log.info("Temperature Sensor = installed");
+				myAdapter.setStateAsync("Settings.TemperatureSensorInstalled", { val: "Yes", ack: true });
+				universalReturnValue = true;
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getPressureSensorInstalled(){
+	// Pressure Sensor installed PSD
+	axios.get(prepareGetRequest("PSD"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			if(response.data.getPSD === "1"){
+				myAdapter.log.info("Pressure Sensor = not installed");
+				myAdapter.setStateAsync("Settings.PressureSensorInstalled", { val: "No", ack: true });
+				universalReturnValue = false;
+			}else{
+				myAdapter.log.info("Pressure Sensor = installed");
+				myAdapter.setStateAsync("Settings.PressureSensorInstalled", { val: "Yes", ack: true });
+				universalReturnValue = true;
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
 function getConductionSensorInstalled(){
-	// Conductivity Limit CSD
+	// Conductivity Sensor Installed CSD
 	axios.get(prepareGetRequest("CSD"))
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
