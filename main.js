@@ -99,7 +99,7 @@ class Wasserwaechter extends utils.Adapter {
 		});
 
 
-		await this.setObjectNotExistsAsync("Settings.IP", {
+		await this.setObjectNotExistsAsync("Device.IP", {
 			type: "state",
 			common: {
 				name: "Device IP Address",
@@ -112,7 +112,7 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		await this.setObjectNotExistsAsync("Settings.Port", {
+		await this.setObjectNotExistsAsync("Device.Port", {
 			type: "state",
 			common: {
 				name: "Device API Port",
@@ -518,8 +518,8 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("testVariable");
 
 		this.subscribeStates("Device.FirmwareVersion");
-		this.subscribeStates("Settings.IP");
-		this.subscribeStates("Settings.Port");
+		this.subscribeStates("Device.IP");
+		this.subscribeStates("Device.Port");
 		this.subscribeStates("Settings.PollingInterval");
 		this.subscribeStates("Settings.Language");
 		this.subscribeStates("Settings.TemperatureSensorInstalled");
@@ -561,8 +561,8 @@ class Wasserwaechter extends utils.Adapter {
 		await this.setStateAsync("Settings.MicroLeakageTestPeriod", { val: this.config.device_microleakagetestperiod, ack: true });
 		await this.setStateAsync("Settings.BuzzerOnAlarm", { val: this.config.device_buzzeronalarm, ack: true });
 
-		await this.setStateAsync("Settings.IP", { val: this.config.device_network_ip, ack: true });
-		await this.setStateAsync("Settings.Port", { val: this.config.device_network_port, ack: true });
+		await this.setStateAsync("Device.IP", { val: this.config.device_network_ip, ack: true });
+		await this.setStateAsync("Device.Port", { val: this.config.device_network_port, ack: true });
 		await this.setStateAsync("Settings.PollingInterval", { val: this.config.device_poll_interval, ack: true });
 
 		// You can also add a subscription for multiple states. The following line watches all states starting with "lights."
