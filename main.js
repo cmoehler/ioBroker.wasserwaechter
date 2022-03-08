@@ -125,6 +125,18 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		await this.setObjectNotExistsAsync("Device.MacAddress", {
+			type: "state",
+			common: {
+				name: "Device MAC Address",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 		await this.setObjectNotExistsAsync("Device.FirmwareVersion", {
 			type: "state",
 			common: {
@@ -547,6 +559,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Device.Port");
 		this.subscribeStates("Device.SerialNumber");
 		this.subscribeStates("Device.CodeNumber");
+		this.subscribeStates("Device.MacAddress");
 
 		this.subscribeStates("Adapter.PollingInterval");
 
@@ -788,6 +801,8 @@ async function initSettings(){
 	getSerialNumber();
 	await sleep(delayTimeMS);
 	getCodeNumber();
+	await sleep(delayTimeMS);
+	getMacAddress();
 	await sleep(delayTimeMS);
 }
 
@@ -1885,6 +1900,19 @@ function getCodeNumber(){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Device Code Number = " + String(response.data.getCNO));
 			myAdapter.setStateAsync("Device.CodeNumber", { val: String(response.data.getCNO), ack: true });
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getMacAddress(){
+	// MAC Adresse MAC
+	axios.get(prepareGetRequest("MAC"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("MAC Adresse = " + String(response.data.getMAC));
+			myAdapter.setStateAsync("Device.MacAddress", { val: String(response.data.getMAC), ack: true });
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
