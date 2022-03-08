@@ -149,6 +149,18 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		await this.setObjectNotExistsAsync("Device.NextMaintenance", {
+			type: "state",
+			common: {
+				name: "Device Next Maintenance",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 		await this.setObjectNotExistsAsync("Device.IP", {
 			type: "state",
 			common: {
@@ -554,14 +566,15 @@ class Wasserwaechter extends utils.Adapter {
 		// In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
 		this.subscribeStates("testVariable");
 
+		this.subscribeStates("Adapter.PollingInterval");
+
 		this.subscribeStates("Device.FirmwareVersion");
 		this.subscribeStates("Device.IP");
 		this.subscribeStates("Device.Port");
 		this.subscribeStates("Device.SerialNumber");
 		this.subscribeStates("Device.CodeNumber");
 		this.subscribeStates("Device.MacAddress");
-
-		this.subscribeStates("Adapter.PollingInterval");
+		this.subscribeStates("Device.NextMaintenance");
 
 		this.subscribeStates("Settings.Language");
 		this.subscribeStates("Device.Sensors.TemperatureSensorInstalled");
@@ -804,6 +817,7 @@ async function initSettings(){
 	await sleep(delayTimeMS);
 	getMacAddress();
 	await sleep(delayTimeMS);
+	getNextMaintenance();
 }
 
 async function initProfiles(){
@@ -1913,6 +1927,19 @@ function getMacAddress(){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("MAC Adresse = " + String(response.data.getMAC));
 			myAdapter.setStateAsync("Device.MacAddress", { val: String(response.data.getMAC), ack: true });
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getNextMaintenance(){
+	// Next Maintenance SRV
+	axios.get(prepareGetRequest("SRV"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Next Maintenance = " + String(response.data.getSRV));
+			myAdapter.setStateAsync("Device.NextMaintenance", { val: String(response.data.getSRV), ack: true });
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
