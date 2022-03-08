@@ -86,6 +86,19 @@ class Wasserwaechter extends utils.Adapter {
 		// ===============================================================
 		// Device States
 		// ===============================================================
+		await this.setObjectNotExistsAsync("Device.FirmwareVersion", {
+			type: "state",
+			common: {
+				name: "Device FirmwareVersion",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+
 		await this.setObjectNotExistsAsync("Settings.IP", {
 			type: "state",
 			common: {
@@ -503,6 +516,8 @@ class Wasserwaechter extends utils.Adapter {
 
 		// In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
 		this.subscribeStates("testVariable");
+
+		this.subscribeStates("Device.FirmwareVersion");
 		this.subscribeStates("Settings.IP");
 		this.subscribeStates("Settings.Port");
 		this.subscribeStates("Settings.PollingInterval");
@@ -582,7 +597,7 @@ class Wasserwaechter extends utils.Adapter {
 		initSettings();
 
 		// Warten bis auslesen der Settings abgeschlossen ist
-		await sleep(10000);
+		await sleep(15000);
 
 		// Profil Einstellungen auslesen
 		initProfiles();
@@ -738,6 +753,8 @@ async function initSettings(){
 	getConductivityLimit();
 	await sleep(delayTimeMS);
 	getConductivityFactor();
+	await sleep(delayTimeMS);
+	getFirmwareVersion();
 	await sleep(delayTimeMS);
 }
 
@@ -1796,6 +1813,19 @@ function getConductivityFactor(){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Conductivity Factor =" + String(response.data.getCNF));
 			myAdapter.setStateAsync("Settings.ConductivityFactor", { val: String(response.data.getCNF), ack: true });
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getFirmwareVersion(){
+	// Firmware Version VER
+	axios.get(prepareGetRequest("VER"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Device FirmwareVersion =" + String(response.data.getVER));
+			myAdapter.setStateAsync("Device.FirmwareVersion", { val: String(response.data.getVER), ack: true });
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
