@@ -113,10 +113,22 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		await this.setObjectNotExistsAsync("Device.CodeNumber", {
+			type: "state",
+			common: {
+				name: "Device Code Number",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 		await this.setObjectNotExistsAsync("Device.FirmwareVersion", {
 			type: "state",
 			common: {
-				name: "Device FirmwareVersion",
+				name: "Device Firmware Version",
 				type: "string",
 				role: "indicator",
 				read: true,
@@ -534,6 +546,8 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Device.IP");
 		this.subscribeStates("Device.Port");
 		this.subscribeStates("Device.SerialNumber");
+		this.subscribeStates("Device.CodeNumber");
+
 		this.subscribeStates("Adapter.PollingInterval");
 
 		this.subscribeStates("Settings.Language");
@@ -719,7 +733,7 @@ function prepareGetRequest(command){
 async function initSettings(){
 
 	myAdapter.log.info("reading out Settings ...");
-	const delayTimeMS = 1000;
+	const delayTimeMS = 800;
 
 	// Spracheinstellung auslesen
 	getLanguage();
@@ -772,6 +786,8 @@ async function initSettings(){
 	getFirmwareVersion();
 	await sleep(delayTimeMS);
 	getSerialNumber();
+	await sleep(delayTimeMS);
+	getCodeNumber();
 	await sleep(delayTimeMS);
 }
 
@@ -1856,6 +1872,19 @@ function getSerialNumber(){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Device Serial Number = " + String(response.data.getSRN));
 			myAdapter.setStateAsync("Device.SerialNumber", { val: String(response.data.getSRN), ack: true });
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getCodeNumber(){
+	// Code Number CNO
+	axios.get(prepareGetRequest("CNO"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Device Code Number = " + String(response.data.getCNO));
+			myAdapter.setStateAsync("Device.CodeNumber", { val: String(response.data.getCNO), ack: true });
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
