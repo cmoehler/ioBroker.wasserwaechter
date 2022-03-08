@@ -163,7 +163,7 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		await this.setObjectNotExistsAsync("Device.TemperatureSensorInstalled", {
+		await this.setObjectNotExistsAsync("Device.Sensors.TemperatureSensorInstalled", {
 			type: "state",
 			common: {
 				name: "Device Temperature Sensor is installed",
@@ -174,7 +174,7 @@ class Wasserwaechter extends utils.Adapter {
 			},
 			native: {},
 		});
-		await this.setObjectNotExistsAsync("Device.PressureSensorInstalled", {
+		await this.setObjectNotExistsAsync("Device.Sensors.PressureSensorInstalled", {
 			type: "state",
 			common: {
 				name: "Device Pressure Sensor is installed",
@@ -186,7 +186,7 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		await this.setObjectNotExistsAsync("Device.ConductivitySensorInstalled", {
+		await this.setObjectNotExistsAsync("Device.Sensors.ConductivitySensorInstalled", {
 			type: "state",
 			common: {
 				name: "Device Conductivity Sensor is installed",
@@ -551,9 +551,9 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Adapter.PollingInterval");
 
 		this.subscribeStates("Settings.Language");
-		this.subscribeStates("Device.TemperatureSensorInstalled");
-		this.subscribeStates("Device.PressureSensorInstalled");
-		this.subscribeStates("Device.ConductivitySensorInstalled");
+		this.subscribeStates("Device.Sensors.TemperatureSensorInstalled");
+		this.subscribeStates("Device.Sensors.PressureSensorInstalled");
+		this.subscribeStates("Device.Sensors.ConductivitySensorInstalled");
 		this.subscribeStates("Settings.ConductivityLimit");
 		this.subscribeStates("Settings.ConductivityFactor");
 
@@ -939,7 +939,7 @@ async function pollData(){
 	await sleep(delayTimeMS);
 	getLeakageProtectionTemporaryDeactivation();
 	await sleep(delayTimeMS);
-	if(myAdapter.getState("Device.ConductivitySensorInstalled") == "Yes"){
+	if(myAdapter.getState("Device.Sensors.ConductivitySensorInstalled") == "Yes"){
 		myAdapter.log.info("Poll: Leitfähigkeitssensor ist installiert");
 		// Leitfähigkeit auslesen
 		await sleep(delayTimeMS);
@@ -1768,11 +1768,11 @@ function getTemperatureSensorInstalled(){
 			myAdapter.log.info(JSON.stringify(response.data));
 			if(response.data.getTSD === "1"){
 				myAdapter.log.info("Temperature Sensor = not installed");
-				myAdapter.setStateAsync("Device.TemperatureSensorInstalled", { val: "No", ack: true });
+				myAdapter.setStateAsync("Device.Sensors.TemperatureSensorInstalled", { val: "No", ack: true });
 				universalReturnValue = false;
 			}else{
 				myAdapter.log.info("Temperature Sensor = installed");
-				myAdapter.setStateAsync("Device.TemperatureSensorInstalled", { val: "Yes", ack: true });
+				myAdapter.setStateAsync("Device.Sensors.TemperatureSensorInstalled", { val: "Yes", ack: true });
 				universalReturnValue = true;
 			}
 		})
@@ -1788,11 +1788,11 @@ function getPressureSensorInstalled(){
 			myAdapter.log.info(JSON.stringify(response.data));
 			if(response.data.getPSD === "1"){
 				myAdapter.log.info("Pressure Sensor = not installed");
-				myAdapter.setStateAsync("Device.PressureSensorInstalled", { val: "No", ack: true });
+				myAdapter.setStateAsync("Device.Sensors.PressureSensorInstalled", { val: "No", ack: true });
 				universalReturnValue = false;
 			}else{
 				myAdapter.log.info("Pressure Sensor = installed");
-				myAdapter.setStateAsync("Device.PressureSensorInstalled", { val: "Yes", ack: true });
+				myAdapter.setStateAsync("Device.Sensors.PressureSensorInstalled", { val: "Yes", ack: true });
 				universalReturnValue = true;
 			}
 		})
@@ -1808,11 +1808,11 @@ function getConductionSensorInstalled(){
 			myAdapter.log.info(JSON.stringify(response.data));
 			if(response.data.getCSD === "1"){
 				myAdapter.log.info("Conductivity Sensor = not installed");
-				myAdapter.setStateAsync("Device.ConductivitySensorInstalled", { val: "No", ack: true });
+				myAdapter.setStateAsync("Device.Sensors.ConductivitySensorInstalled", { val: "No", ack: true });
 				universalReturnValue = false;
 			}else{
 				myAdapter.log.info("Conductivity Sensor = installed");
-				myAdapter.setStateAsync("Device.ConductivitySensorInstalled", { val: "Yes", ack: true });
+				myAdapter.setStateAsync("Device.Sensors.ConductivitySensorInstalled", { val: "Yes", ack: true });
 				universalReturnValue = true;
 			}
 		})
