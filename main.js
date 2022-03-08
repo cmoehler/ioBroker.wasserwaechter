@@ -341,6 +341,19 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		await this.setObjectNotExistsAsync("Conditions.PowerAdaptorDcVoltage", {
+			type: "state",
+			common: {
+				name: "Power Adaptor DC Voltage",
+				type: "string",
+				role: "indicator",
+				unit: "V",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 		await this.setObjectNotExistsAsync("Conditions.StopValve", {
 			type: "state",
 			common: {
@@ -584,6 +597,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Settings.ConductivityFactor");
 
 		this.subscribeStates("Conditions.BatteryVoltage");
+		this.subscribeStates("Conditions.PowerAdaptorDcVoltage");
 		this.subscribeStates("Conditions.StopValve");
 		this.subscribeStates("Conditions.Alarm");
 		this.subscribeStates("Conditions.LeakageProtectionTemporaryDeactivation");
@@ -951,7 +965,7 @@ async function initProfiles(){
 async function pollData(){
 
 	myAdapter.log.info("poll trigger erhalten");
-	const delayTimeMS = 1000;
+	const delayTimeMS = 800;
 
 	// Zustandsdaten abrufen
 	getTotalWaterVolume();
@@ -965,6 +979,8 @@ async function pollData(){
 	getStopValve();
 	await sleep(delayTimeMS);
 	getBatterieVoltage();
+	await sleep(delayTimeMS);
+	getPowerAdaptorDcVoltage();
 	await sleep(delayTimeMS);
 	getLeakageProtectionTemporaryDeactivation();
 	await sleep(delayTimeMS);
@@ -1466,6 +1482,22 @@ function getBatterieVoltage(){
 			myAdapter.log.info("Batteriespannung = " + response.data.getBAT + " Volt");
 			myAdapter.log.info("Batteriespannung = " + String(btv) + " Volt (Zahl)");
 			myAdapter.setStateAsync("Conditions.BatteryVoltage", { val: btv, ack: true });
+
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getPowerAdaptorDcVoltage(){
+	// Spannung Netzteil NET
+	axios.get(prepareGetRequest("NET"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			const pav = parseFloat(String(response.data.getNET).replace(",",".")).toFixed(2);
+			myAdapter.log.info("Power Adaptor DC Voltage = " + response.data.getNET + " Volt");
+			myAdapter.log.info("Netzteil Spannung = " + String(pav) + " Volt (Zahl)");
+			myAdapter.setStateAsync("Conditions.PowerAdaptorDcVoltage", { val: pav, ack: true });
 
 		})
 		.catch(function(error){
