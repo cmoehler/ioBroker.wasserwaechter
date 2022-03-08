@@ -249,6 +249,19 @@ class Wasserwaechter extends utils.Adapter {
 			},
 			native: {},
 		});
+
+		await this.setObjectNotExistsAsync("Settings.ConductivityFactor", {
+			type: "state",
+			common: {
+				name: "Conductivity Factor",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 		// ===============================================================
 		// Condition States
 		// ===============================================================
@@ -497,6 +510,8 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Settings.TemperatureSensorInstalled");
 		this.subscribeStates("Settings.PressureSensorInstalled");
 		this.subscribeStates("Settings.ConductivitySensorInstalled");
+		this.subscribeStates("Settings.ConductivityLimit");
+		this.subscribeStates("Settings.ConductivityFactor");
 
 		this.subscribeStates("Conditions.BatteryVoltage");
 		this.subscribeStates("Conditions.StopValve");
@@ -698,6 +713,8 @@ async function initSettings(){
 	}else{
 		myAdapter.log.info("Init: Temperatursensor ist nicht installiert");
 	}
+	await sleep(delayTimeMS);
+
 	// Drucksensor
 	getPressureSensorInstalled();
 	if(universalReturnValue === true){
@@ -707,16 +724,21 @@ async function initSettings(){
 	}else{
 		myAdapter.log.info("Init: Drucksensor ist nicht installiert");
 	}
+	await sleep(delayTimeMS);
+
 	// Leitfähigkeitssensor
 	getConductionSensorInstalled();
 	if(universalReturnValue === true){
 		myAdapter.log.info("Init: Leitfähigkeitssensor ist installiert");
-		await sleep(delayTimeMS);
-		getConductivityLimit();
-		await sleep(delayTimeMS);
 	}else{
 		myAdapter.log.info("Init: Leitfähigkeitssensor ist nicht installiert");
 	}
+	await sleep(delayTimeMS);
+
+	getConductivityLimit();
+	await sleep(delayTimeMS);
+	getConductivityFactor();
+	await sleep(delayTimeMS);
 }
 
 async function initProfiles(){
@@ -1749,7 +1771,6 @@ function getConductionSensorInstalled(){
 		});
 }
 
-
 function getConductivityLimit(){
 	// Conductivity Limit CNL
 	axios.get(prepareGetRequest("CNL"))
@@ -1762,6 +1783,19 @@ function getConductivityLimit(){
 				myAdapter.log.info("Leakage Protection Temporary Deactivation = " + String(response.data.getCNL) + " uS/cm");
 				myAdapter.setStateAsync("Settings.ConductivityLimit", { val: response.data.getCNL, ack: true });
 			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getConductivityFactor(){
+	// Conductivity Factor CNF
+	axios.get(prepareGetRequest("CNF"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Conductivity Factor =" + String(response.data.getCNF));
+			myAdapter.setStateAsync("Settings.ConductivityFactor", { val: String(response.data.getCNF), ack: true });
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
