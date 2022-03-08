@@ -82,10 +82,37 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
+		// ===============================================================
+		// Adapter Settings
+		// ===============================================================
+		await this.setObjectNotExistsAsync("Adapter.PollingInterval", {
+			type: "state",
+			common: {
+				name: "Adapter Polling Interval",
+				type: "string",
+				role: "indicator",
+				unit: "s",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
 
 		// ===============================================================
 		// Device States
 		// ===============================================================
+		await this.setObjectNotExistsAsync("Device.SerialNumber", {
+			type: "state",
+			common: {
+				name: "Device Serial Number",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 		await this.setObjectNotExistsAsync("Device.FirmwareVersion", {
 			type: "state",
 			common: {
@@ -97,7 +124,6 @@ class Wasserwaechter extends utils.Adapter {
 			},
 			native: {},
 		});
-
 
 		await this.setObjectNotExistsAsync("Device.IP", {
 			type: "state",
@@ -119,19 +145,6 @@ class Wasserwaechter extends utils.Adapter {
 				type: "string",
 				role: "indicator",
 				unit: "Port",
-				read: true,
-				write: true,
-			},
-			native: {},
-		});
-
-		await this.setObjectNotExistsAsync("Settings.PollingInterval", {
-			type: "state",
-			common: {
-				name: "Device Polling Interval",
-				type: "string",
-				role: "indicator",
-				unit: "s",
 				read: true,
 				write: true,
 			},
@@ -520,7 +533,9 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Device.FirmwareVersion");
 		this.subscribeStates("Device.IP");
 		this.subscribeStates("Device.Port");
-		this.subscribeStates("Settings.PollingInterval");
+		this.subscribeStates("Device.SerialNumber");
+		this.subscribeStates("Adapter.PollingInterval");
+
 		this.subscribeStates("Settings.Language");
 		this.subscribeStates("Device.TemperatureSensorInstalled");
 		this.subscribeStates("Device.PressureSensorInstalled");
@@ -563,7 +578,7 @@ class Wasserwaechter extends utils.Adapter {
 
 		await this.setStateAsync("Device.IP", { val: this.config.device_network_ip, ack: true });
 		await this.setStateAsync("Device.Port", { val: this.config.device_network_port, ack: true });
-		await this.setStateAsync("Settings.PollingInterval", { val: this.config.device_poll_interval, ack: true });
+		await this.setStateAsync("Adapter.PollingInterval", { val: this.config.device_poll_interval, ack: true });
 
 		// You can also add a subscription for multiple states. The following line watches all states starting with "lights."
 		// this.subscribeStates("lights.*");
@@ -755,6 +770,8 @@ async function initSettings(){
 	getConductivityFactor();
 	await sleep(delayTimeMS);
 	getFirmwareVersion();
+	await sleep(delayTimeMS);
+	getSerialNumber();
 	await sleep(delayTimeMS);
 }
 
@@ -1826,6 +1843,19 @@ function getFirmwareVersion(){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Device FirmwareVersion =" + String(response.data.getVER));
 			myAdapter.setStateAsync("Device.FirmwareVersion", { val: String(response.data.getVER), ack: true });
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getSerialNumber(){
+	// Serial Number SRN
+	axios.get(prepareGetRequest("SRN"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Device Serial Number = " + String(response.data.getSRN));
+			myAdapter.setStateAsync("Device.SerialNumber", { val: String(response.data.getSRN), ack: true });
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
