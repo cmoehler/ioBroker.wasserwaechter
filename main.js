@@ -327,6 +327,43 @@ class Wasserwaechter extends utils.Adapter {
 		// ===============================================================
 		// Condition States
 		// ===============================================================
+		await this.setObjectNotExistsAsync("Conditions.WaterTemperature", {
+			type: "state",
+			common: {
+				name: "Water Temperature",
+				type: "string",
+				role: "indicator",
+				unit: "°",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+		await this.setObjectNotExistsAsync("Conditions.WaterPressure", {
+			type: "state",
+			common: {
+				name: "Water Pressure",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
+		await this.setObjectNotExistsAsync("Conditions.WaterConductivity", {
+			type: "state",
+			common: {
+				name: "Water Conductivity",
+				type: "string",
+				role: "indicator",
+				unit: "uS/cm",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
 
 		await this.setObjectNotExistsAsync("Conditions.BatteryVoltage", {
 			type: "state",
@@ -596,6 +633,9 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Settings.ConductivityLimit");
 		this.subscribeStates("Settings.ConductivityFactor");
 
+		this.subscribeStates("Conditions.Conditions.WaterTemperature");
+		this.subscribeStates("Conditions.Conditions.WaterPressure");
+		this.subscribeStates("Conditions.Conditions.WaterConductivity");
 		this.subscribeStates("Conditions.BatteryVoltage");
 		this.subscribeStates("Conditions.PowerAdaptorDcVoltage");
 		this.subscribeStates("Conditions.StopValve");
@@ -837,10 +877,10 @@ async function initSettings(){
 async function initProfiles(){
 
 	myAdapter.log.info("init Profile trigger erhalten");
-
+	const sleepTime = 800;
 	// anzahl aktive Profile ermitteln
 	getNumActiveProfiles();
-	await sleep(1000);
+	await sleep(sleepTime);
 
 	if(universalReturnValue != null){
 
@@ -852,7 +892,7 @@ async function initProfiles(){
 		{
 			// Profil Status
 			getProfilesStatus(i);
-			await sleep(1000);
+			await sleep(sleepTime);
 
 			if(String(universalReturnValue) == "1")
 			{
@@ -865,13 +905,13 @@ async function initProfiles(){
 
 			// Profil Name
 			getProfilesName(i);
-			await sleep(1000);
+			await sleep(sleepTime);
 			myAdapter.log.info("Profil " + String(i) + " Name: " + String(universalReturnValue));
 			myAdapter.setStateAsync("Profiles." + String(i) +".Name", { val: String(universalReturnValue), ack: true });
 
 			// Leckage Volumen
 			getProfilesLeakVolume(i);
-			await sleep(1000);
+			await sleep(sleepTime);
 			if(String(universalReturnValue) == "0")
 			{
 				myAdapter.log.info("Profil " + String(i) + " Leak Volume: disabled");
@@ -883,7 +923,7 @@ async function initProfiles(){
 
 			// Leckage Zeit
 			getProfilesLeakTime(i);
-			await sleep(1000);
+			await sleep(sleepTime);
 			if(String(universalReturnValue) == "0")
 			{
 				myAdapter.log.info("Profil " + String(i) + " Leak Time: disabled");
@@ -895,7 +935,7 @@ async function initProfiles(){
 
 			// Leckage Max Flow L/h
 			getProfilesLeakMaxFlow(i);
-			await sleep(1000);
+			await sleep(sleepTime);
 			if(String(universalReturnValue) == "0")
 			{
 				myAdapter.log.info("Profil " + String(i) + " Leak Max Flow: disabled");
@@ -907,7 +947,7 @@ async function initProfiles(){
 
 			// Leak Microleak Detection Status
 			getProfilesLeakMicroLeakDetection(i);
-			await sleep(1000);
+			await sleep(sleepTime);
 
 			if(String(universalReturnValue) == "1")
 			{
@@ -920,7 +960,7 @@ async function initProfiles(){
 
 			// Return Time to Standard Profile
 			getProfilesReturnTimeToStandard(i);
-			await sleep(1000);
+			await sleep(sleepTime);
 			if(String(universalReturnValue) == "0")
 			{
 				myAdapter.log.info("Profil " + String(i) + " Return Time to Standard Profile: disabled");
@@ -932,7 +972,7 @@ async function initProfiles(){
 
 			// Profile Buzzer
 			getProfileBuzzer(i);
-			await sleep(1000);
+			await sleep(sleepTime);
 			if(String(universalReturnValue) == "0")
 			{
 				myAdapter.log.info("Profil " + String(i) + " Buzzer: off");
@@ -944,7 +984,7 @@ async function initProfiles(){
 
 			// Profile Leakage Warning
 			getProfileLeakageWarning(i);
-			await sleep(1000);
+			await sleep(sleepTime);
 			if(String(universalReturnValue) == "0")
 			{
 				myAdapter.log.info("Profil " + String(i) + " Leakage Warning: off");
@@ -983,10 +1023,61 @@ async function pollData(){
 	getPowerAdaptorDcVoltage();
 	await sleep(delayTimeMS);
 	getLeakageProtectionTemporaryDeactivation();
+
 	await sleep(delayTimeMS);
+	// Wassertemperatur
+	if(myAdapter.getState("Device.Sensors.TemperatureSensorInstalled") == "Yes"){
+		myAdapter.log.info("Poll: Temperatursensor ist installiert");
+		// Wasserdruck auslesen
+		if(myAdapter.getState("Settings.Units") === "°C/bar/Liter"){
+			// metrisch
+			getWaterPressure("°C");
+		}
+		else if(myAdapter.getState("Settings.Units") === "°F/psi/US.liq.gal"){
+			// imperial
+			getWaterPressure("°F");
+		}else
+		{
+			// undefiniert
+			getWaterPressure("unit unkowen");
+
+		}
+		await sleep(delayTimeMS);
+	}
+	else{
+		myAdapter.log.info("Poll: Temperatursensor ist nicht installiert");
+	}
+
+	await sleep(delayTimeMS);
+	// Wasserdruck
+	if(myAdapter.getState("Device.Sensors.PressureSensorInstalled") == "Yes"){
+		myAdapter.log.info("Poll: Drucksensor ist installiert");
+		// Wasserdruck auslesen
+		if(myAdapter.getState("Settings.Units") === "°C/bar/Liter"){
+			// metrisch
+			getWaterPressure("bar");
+		}
+		else if(myAdapter.getState("Settings.Units") === "°F/psi/US.liq.gal"){
+			// imperial
+			getWaterPressure("psi");
+		}else
+		{
+			// undefiniert
+			getWaterPressure("unit unkowen");
+
+		}
+		await sleep(delayTimeMS);
+	}
+	else{
+		myAdapter.log.info("Poll: Drucksensor ist nicht installiert");
+	}
+
+	await sleep(delayTimeMS);
+	// Wasser Leitfähigkeit
 	if(myAdapter.getState("Device.Sensors.ConductivitySensorInstalled") == "Yes"){
 		myAdapter.log.info("Poll: Leitfähigkeitssensor ist installiert");
 		// Leitfähigkeit auslesen
+		getWaterConductivity("uS/cm");
 		await sleep(delayTimeMS);
 	}
 	else{
@@ -1543,6 +1634,46 @@ function getTotalWaterVolume(){
 			myAdapter.log.error(error);
 		});
 }
+
+function getWaterTemperature(unit){
+	// Wassertemperatur CEL
+	axios.get(prepareGetRequest("CEL"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("WasserTemperatur = " + response.data.getCEL + " " + unit);
+			myAdapter.setStateAsync("Consumptions.WaterTemperature", { val: String(response.data.getCEL), ack: true });
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getWaterPressure(unit){
+	// Wasserdruck BAR
+	axios.get(prepareGetRequest("BAR"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Wasser Druck = " + response.data.getBAR + " " + unit);
+			myAdapter.setStateAsync("Consumptions.WaterPressure", { val: String(response.data.getBAR), ack: true });
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
+function getWaterConductivity(unit){
+	// Wasser Leitfähigkeit CND
+	axios.get(prepareGetRequest("CND"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Wasser Leitfähigkeit = " + response.data.getCND + " " + unit);
+			myAdapter.setStateAsync("Consumptions.WaterConductivity", { val: String(response.data.getCND), ack: true });
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
 
 function getAlarm(){
 	// Alarm ALA
