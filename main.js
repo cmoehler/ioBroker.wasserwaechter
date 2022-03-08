@@ -57,10 +57,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.log.info("Micro Leakage Test Period: " + this.config.device_microleakagetestperiod);
 		this.log.info("Buzzer On Alarm: " + this.config.device_buzzeronalarm);
 
-		this.log.info("Conductivity Sensor installed: " + this.config.device_conductivitysensorinstalled);
 		this.log.info("Conductivity Limit: " + this.config.device_conductivitylimit);
-
-
 
 		this.log.info("Device Network Address: " + this.config.device_network_ip);
 		this.log.info("Device Network Port: " + this.config.device_network_port);
@@ -127,6 +124,19 @@ class Wasserwaechter extends utils.Adapter {
 			},
 			native: {},
 		});
+
+		await this.setObjectNotExistsAsync("Settings.ConductivitySensorInstalled", {
+			type: "state",
+			common: {
+				name: "Device Conductivity Sensor is installed",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 
 		// ===============================================================
 		// User Settings
@@ -196,18 +206,6 @@ class Wasserwaechter extends utils.Adapter {
 			type: "state",
 			common: {
 				name: "Buzzer On Alarm",
-				type: "string",
-				role: "indicator",
-				read: true,
-				write: true,
-			},
-			native: {},
-		});
-
-		await this.setObjectNotExistsAsync("Settings.ConductivitySensorInstalled", {
-			type: "state",
-			common: {
-				name: "Conductivity Sensor Installed",
 				type: "string",
 				role: "indicator",
 				read: true,
@@ -473,6 +471,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Settings.Port");
 		this.subscribeStates("Settings.PollingInterval");
 		this.subscribeStates("Settings.Language");
+		this.subscribeStates("Settings.ConductivitySensorInstalled");
 
 		this.subscribeStates("Conditions.BatteryVoltage");
 		this.subscribeStates("Conditions.StopValve");
@@ -630,7 +629,6 @@ class Wasserwaechter extends utils.Adapter {
 	// 		}
 	// 	}
 	// }
-
 }
 
 if (require.main !== module) {
@@ -673,8 +671,15 @@ async function initSettings(){
 	await sleep(delayTimeMS);
 	getBuzzerOnAlarm();
 	await sleep(delayTimeMS);
-	getConductivityLimit();
-	await sleep(delayTimeMS);
+	getConductionSensorInstalled();
+	if(universalReturnValue === true){
+		myAdapter.log.info("Init: Leitfähigkeitssensor ist installiert");
+		await sleep(delayTimeMS);
+		getConductivityLimit();
+		await sleep(delayTimeMS);
+	}else{
+		myAdapter.log.info("Init: Leitfähigkeitssensor ist nicht installiert");
+	}
 }
 
 async function initProfiles(){
@@ -825,9 +830,13 @@ async function pollData(){
 	await sleep(delayTimeMS);
 	getLeakageProtectionTemporaryDeactivation();
 	await sleep(delayTimeMS);
-	if(myAdapter.config.device_conductivitysensorinstalled == true){
+	if(myAdapter.getState("Settings.ConductivitySensorInstalled") == "Yes"){
+		myAdapter.log.info("Poll: Leitfähigkeitssensor ist installiert");
 		// Leitfähigkeit auslesen
 		await sleep(delayTimeMS);
+	}
+	else{
+		myAdapter.log.info("Poll: Leitfähigkeitssensor ist nicht installiert");
 	}
 
 }
@@ -1642,6 +1651,27 @@ function getBuzzerOnAlarm(){
 			myAdapter.log.error(error);
 		});
 }
+
+function getConductionSensorInstalled(){
+	// Conductivity Limit CSD
+	axios.get(prepareGetRequest("CSD"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			if(response.data.getCSD === "1"){
+				myAdapter.log.info("Conductivity Sensor = not installed");
+				myAdapter.setStateAsync("Settings.ConductivitySensorInstalled", { val: "No", ack: true });
+				universalReturnValue = false;
+			}else{
+				myAdapter.log.info("Conductivity Sensor = installed");
+				myAdapter.setStateAsync("Settings.ConductivitySensorInstalled", { val: "Yes", ack: true });
+				universalReturnValue = true;
+			}
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+		});
+}
+
 
 function getConductivityLimit(){
 	// Conductivity Limit CNL
