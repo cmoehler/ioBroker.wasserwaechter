@@ -476,6 +476,18 @@ class Wasserwaechter extends utils.Adapter {
 
 		// Profile
 
+		await this.setObjectNotExistsAsync("Profiles.SelectedProfile", {
+			type: "state",
+			common: {
+				name: "Selected Profile",
+				type: "string",
+				role: "indicator",
+				read: true,
+				write: true,
+			},
+			native: {},
+		});
+
 		await this.setObjectNotExistsAsync("Profiles.Active", {
 			type: "state",
 			common: {
@@ -648,6 +660,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Consumptions.CurrentVolume");
 
 		this.subscribeStates("Profiles.Active");
+		this.subscribeStates("Profiles.SelectedProfile");
 
 		// Die 8Profil Events adoptieren
 		for (let i = 1; i < 9; i++){
@@ -881,6 +894,8 @@ async function initProfiles(){
 	// anzahl aktive Profile ermitteln
 	getNumActiveProfiles();
 	await sleep(sleepTime);
+	getSelectedProfile();
+	await sleep(sleepTime);
 
 	if(universalReturnValue != null){
 
@@ -1031,15 +1046,15 @@ async function pollData(){
 		// Wasserdruck auslesen
 		if(myAdapter.getState("Settings.Units") === "°C/bar/Liter"){
 			// metrisch
-			getWaterPressure("°C");
+			getWaterTemperature("°C");
 		}
 		else if(myAdapter.getState("Settings.Units") === "°F/psi/US.liq.gal"){
 			// imperial
-			getWaterPressure("°F");
+			getWaterTemperature("°F");
 		}else
 		{
 			// undefiniert
-			getWaterPressure("unit unkowen");
+			getWaterTemperature("unit unkowen");
 
 		}
 		await sleep(delayTimeMS);
@@ -1536,6 +1551,21 @@ function getNumActiveProfiles(){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Aktive Profile = " + response.data.getPRN + " Stück");
 			universalReturnValue = response.data.getPRN;
+		})
+		.catch(function(error){
+			myAdapter.log.error(error);
+			universalReturnValue = null;
+		});
+}
+
+function getSelectedProfile(){
+	// Aktives Profil PRF
+	axios.get(prepareGetRequest("PRF"))
+		.then(function(response){
+			myAdapter.log.info(JSON.stringify(response.data));
+			myAdapter.log.info("Selected Profile = " + response.data.getPRF);
+			myAdapter.setStateAsync("Profiles.SelectedProfile", { val: String(response.data.getPRF), ack: true });
+			universalReturnValue = response.data.getPRF;
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
