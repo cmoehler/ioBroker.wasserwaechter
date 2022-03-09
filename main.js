@@ -893,14 +893,15 @@ async function initProfiles(){
 	const sleepTime = 800;
 	// anzahl aktive Profile ermitteln
 	getNumActiveProfiles();
-	await sleep(sleepTime);
-	getSelectedProfile();
-	await sleep(sleepTime);
 
 	if(universalReturnValue != null){
 
 		myAdapter.log.info("Wir haben " + String(universalReturnValue) +" Aktive Profile.");
 		myAdapter.setStateAsync("Profiles.Active", { val: universalReturnValue, ack: true });
+		await sleep(sleepTime);
+
+		getSelectedProfile();
+		await sleep(sleepTime);
 
 		// alle 8 möglichen Profile durchlaufen
 		for(let i = 1; i < 9; i++)
