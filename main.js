@@ -895,124 +895,115 @@ async function initProfiles(){
 	getNumActiveProfiles();
 	await sleep(sleepTime);
 
-	if(myAdapter.getState("Profiles.ActiveProfiles") != null){
+	getSelectedProfile();
+	await sleep(sleepTime);
 
-
-		getSelectedProfile();
+	// alle 8 möglichen Profile durchlaufen
+	for(let i = 1; i < 9; i++)
+	{
+		// Profil Status
+		getProfilesStatus(i);
 		await sleep(sleepTime);
 
-		// alle 8 möglichen Profile durchlaufen
-		for(let i = 1; i < 9; i++)
+		if(String(universalReturnValue) == "1")
 		{
-			// Profil Status
-			getProfilesStatus(i);
-			await sleep(sleepTime);
-
-			if(String(universalReturnValue) == "1")
-			{
-				myAdapter.log.info("Profil " + String(i) + " ist aktiv");
-				myAdapter.setStateAsync("Profiles." + String(i) +".Aktiv", { val: "active", ack: true });
-			}else{
-				myAdapter.log.info("Profil " + String(i) + " ist inaktiv");
-				myAdapter.setStateAsync("Profiles." + String(i) +".Aktiv", { val: "not active", ack: true });
-			}
-
-			// Profil Name
-			getProfilesName(i);
-			await sleep(sleepTime);
-			myAdapter.log.info("Profil " + String(i) + " Name: " + String(universalReturnValue));
-			myAdapter.setStateAsync("Profiles." + String(i) +".Name", { val: String(universalReturnValue), ack: true });
-
-			// Leckage Volumen
-			getProfilesLeakVolume(i);
-			await sleep(sleepTime);
-			if(String(universalReturnValue) == "0")
-			{
-				myAdapter.log.info("Profil " + String(i) + " Leak Volume: disabled");
-				myAdapter.setStateAsync("Profiles." + String(i) +".LeakVolume", { val: "disabled", ack: true });
-			}else{
-				myAdapter.log.info("Profil " + String(i) + " Leak Volume: " + String(universalReturnValue) + " L");
-				myAdapter.setStateAsync("Profiles." + String(i) +".LeakVolume", { val: String(universalReturnValue), ack: true });
-			}
-
-			// Leckage Zeit
-			getProfilesLeakTime(i);
-			await sleep(sleepTime);
-			if(String(universalReturnValue) == "0")
-			{
-				myAdapter.log.info("Profil " + String(i) + " Leak Time: disabled");
-				myAdapter.setStateAsync("Profiles." + String(i) +".LeakTime", { val: "disabled", ack: true });
-			}else{
-				myAdapter.log.info("Profil " + String(i) + " Leak Time: " + String(universalReturnValue) + " min");
-				myAdapter.setStateAsync("Profiles." + String(i) +".LeakTime", { val: String(universalReturnValue), ack: true });
-			}
-
-			// Leckage Max Flow L/h
-			getProfilesLeakMaxFlow(i);
-			await sleep(sleepTime);
-			if(String(universalReturnValue) == "0")
-			{
-				myAdapter.log.info("Profil " + String(i) + " Leak Max Flow: disabled");
-				myAdapter.setStateAsync("Profiles." + String(i) +".LeakMaxFlow", { val: "disabled", ack: true });
-			}else{
-				myAdapter.log.info("Profil " + String(i) + " Max Flow: " + String(universalReturnValue) + " L/h");
-				myAdapter.setStateAsync("Profiles." + String(i) +".LeakMaxFlow", { val: String(universalReturnValue), ack: true });
-			}
-
-			// Leak Microleak Detection Status
-			getProfilesLeakMicroLeakDetection(i);
-			await sleep(sleepTime);
-
-			if(String(universalReturnValue) == "1")
-			{
-				myAdapter.log.info("Profil " + String(i) + " Micro LeakD Detection ist aktiv");
-				myAdapter.setStateAsync("Profiles." + String(i) +".LeakMicroLeakDetection", { val: "active", ack: true });
-			}else{
-				myAdapter.log.info("Profil " + String(i) + " Leak MicroLeak Detection ist inaktiv");
-				myAdapter.setStateAsync("Profiles." + String(i) +".LeakMicroLeakDetection", { val: "not active", ack: true });
-			}
-
-			// Return Time to Standard Profile
-			getProfilesReturnTimeToStandard(i);
-			await sleep(sleepTime);
-			if(String(universalReturnValue) == "0")
-			{
-				myAdapter.log.info("Profil " + String(i) + " Return Time to Standard Profile: disabled");
-				myAdapter.setStateAsync("Profiles." + String(i) +".ReturnTimeToStandardProfile", { val: "disabled", ack: true });
-			}else{
-				myAdapter.log.info("Profil " + String(i) + " Return Time to Standard Profile: " + String(universalReturnValue) + " h");
-				myAdapter.setStateAsync("Profiles." + String(i) +".ReturnTimeToStandardProfile", { val: String(universalReturnValue), ack: true });
-			}
-
-			// Profile Buzzer
-			getProfileBuzzer(i);
-			await sleep(sleepTime);
-			if(String(universalReturnValue) == "0")
-			{
-				myAdapter.log.info("Profil " + String(i) + " Buzzer: off");
-				myAdapter.setStateAsync("Profiles." + String(i) +".Buzzer", { val: "off", ack: true });
-			}else{
-				myAdapter.log.info("Profil " + String(i) + " Buzzer: on");
-				myAdapter.setStateAsync("Profiles." + String(i) +".Buzzer", { val: "on", ack: true });
-			}
-
-			// Profile Leakage Warning
-			getProfileLeakageWarning(i);
-			await sleep(sleepTime);
-			if(String(universalReturnValue) == "0")
-			{
-				myAdapter.log.info("Profil " + String(i) + " Leakage Warning: off");
-				myAdapter.setStateAsync("Profiles." + String(i) +".LeakageWarning", { val: "off", ack: true });
-			}else{
-				myAdapter.log.info("Profil " + String(i) + " Leakage Warning: on");
-				myAdapter.setStateAsync("Profiles." + String(i) +".LeakageWarning", { val: "on", ack: true });
-			}
-
+			myAdapter.log.info("Profil " + String(i) + " ist aktiv");
+			myAdapter.setStateAsync("Profiles." + String(i) +".Aktiv", { val: "active", ack: true });
+		}else{
+			myAdapter.log.info("Profil " + String(i) + " ist inaktiv");
+			myAdapter.setStateAsync("Profiles." + String(i) +".Aktiv", { val: "not active", ack: true });
 		}
 
-	}else{
-		myAdapter.log.info("Keine Aktiven Profile!!!");
-		myAdapter.setStateAsync("Profiles.Active", { val: 0, ack: true });
+		// Profil Name
+		getProfilesName(i);
+		await sleep(sleepTime);
+		myAdapter.log.info("Profil " + String(i) + " Name: " + String(universalReturnValue));
+		myAdapter.setStateAsync("Profiles." + String(i) +".Name", { val: String(universalReturnValue), ack: true });
+
+		// Leckage Volumen
+		getProfilesLeakVolume(i);
+		await sleep(sleepTime);
+		if(String(universalReturnValue) == "0")
+		{
+			myAdapter.log.info("Profil " + String(i) + " Leak Volume: disabled");
+			myAdapter.setStateAsync("Profiles." + String(i) +".LeakVolume", { val: "disabled", ack: true });
+		}else{
+			myAdapter.log.info("Profil " + String(i) + " Leak Volume: " + String(universalReturnValue) + " L");
+			myAdapter.setStateAsync("Profiles." + String(i) +".LeakVolume", { val: String(universalReturnValue), ack: true });
+		}
+
+		// Leckage Zeit
+		getProfilesLeakTime(i);
+		await sleep(sleepTime);
+		if(String(universalReturnValue) == "0")
+		{
+			myAdapter.log.info("Profil " + String(i) + " Leak Time: disabled");
+			myAdapter.setStateAsync("Profiles." + String(i) +".LeakTime", { val: "disabled", ack: true });
+		}else{
+			myAdapter.log.info("Profil " + String(i) + " Leak Time: " + String(universalReturnValue) + " min");
+			myAdapter.setStateAsync("Profiles." + String(i) +".LeakTime", { val: String(universalReturnValue), ack: true });
+		}
+
+		// Leckage Max Flow L/h
+		getProfilesLeakMaxFlow(i);
+		await sleep(sleepTime);
+		if(String(universalReturnValue) == "0")
+		{
+			myAdapter.log.info("Profil " + String(i) + " Leak Max Flow: disabled");
+			myAdapter.setStateAsync("Profiles." + String(i) +".LeakMaxFlow", { val: "disabled", ack: true });
+		}else{
+			myAdapter.log.info("Profil " + String(i) + " Max Flow: " + String(universalReturnValue) + " L/h");
+			myAdapter.setStateAsync("Profiles." + String(i) +".LeakMaxFlow", { val: String(universalReturnValue), ack: true });
+		}
+
+		// Leak Microleak Detection Status
+		getProfilesLeakMicroLeakDetection(i);
+		await sleep(sleepTime);
+
+		if(String(universalReturnValue) == "1")
+		{
+			myAdapter.log.info("Profil " + String(i) + " Micro LeakD Detection ist aktiv");
+			myAdapter.setStateAsync("Profiles." + String(i) +".LeakMicroLeakDetection", { val: "active", ack: true });
+		}else{
+			myAdapter.log.info("Profil " + String(i) + " Leak MicroLeak Detection ist inaktiv");
+			myAdapter.setStateAsync("Profiles." + String(i) +".LeakMicroLeakDetection", { val: "not active", ack: true });
+		}
+
+		// Return Time to Standard Profile
+		getProfilesReturnTimeToStandard(i);
+		await sleep(sleepTime);
+		if(String(universalReturnValue) == "0")
+		{
+			myAdapter.log.info("Profil " + String(i) + " Return Time to Standard Profile: disabled");
+			myAdapter.setStateAsync("Profiles." + String(i) +".ReturnTimeToStandardProfile", { val: "disabled", ack: true });
+		}else{
+			myAdapter.log.info("Profil " + String(i) + " Return Time to Standard Profile: " + String(universalReturnValue) + " h");
+			myAdapter.setStateAsync("Profiles." + String(i) +".ReturnTimeToStandardProfile", { val: String(universalReturnValue), ack: true });
+		}
+
+		// Profile Buzzer
+		getProfileBuzzer(i);
+		await sleep(sleepTime);
+		if(String(universalReturnValue) == "0")
+		{
+			myAdapter.log.info("Profil " + String(i) + " Buzzer: off");
+			myAdapter.setStateAsync("Profiles." + String(i) +".Buzzer", { val: "off", ack: true });
+		}else{
+			myAdapter.log.info("Profil " + String(i) + " Buzzer: on");
+			myAdapter.setStateAsync("Profiles." + String(i) +".Buzzer", { val: "on", ack: true });
+		}
+
+		// Profile Leakage Warning
+		getProfileLeakageWarning(i);
+		await sleep(sleepTime);
+		if(String(universalReturnValue) == "0")
+		{
+			myAdapter.log.info("Profil " + String(i) + " Leakage Warning: off");
+			myAdapter.setStateAsync("Profiles." + String(i) +".LeakageWarning", { val: "off", ack: true });
+		}else{
+			myAdapter.log.info("Profil " + String(i) + " Leakage Warning: on");
+			myAdapter.setStateAsync("Profiles." + String(i) +".LeakageWarning", { val: "on", ack: true });
+		}
 	}
 }
 
