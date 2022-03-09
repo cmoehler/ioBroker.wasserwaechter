@@ -488,7 +488,7 @@ class Wasserwaechter extends utils.Adapter {
 			native: {},
 		});
 
-		await this.setObjectNotExistsAsync("Profiles.Active", {
+		await this.setObjectNotExistsAsync("Profiles.ActiveProfiles", {
 			type: "state",
 			common: {
 				name: "Active Profiles",
@@ -659,7 +659,7 @@ class Wasserwaechter extends utils.Adapter {
 		this.subscribeStates("Consumptions.TotalVolume");
 		this.subscribeStates("Consumptions.CurrentVolume");
 
-		this.subscribeStates("Profiles.Active");
+		this.subscribeStates("Profiles.ActiveProfiles");
 		this.subscribeStates("Profiles.SelectedProfile");
 
 		// Die 8Profil Events adoptieren
@@ -893,12 +893,10 @@ async function initProfiles(){
 	const sleepTime = 800;
 	// anzahl aktive Profile ermitteln
 	getNumActiveProfiles();
+	await sleep(sleepTime);
 
-	if(universalReturnValue != null){
+	if(myAdapter.getState("Profiles.ActiveProfiles") != null){
 
-		myAdapter.log.info("Wir haben " + String(universalReturnValue) +" Aktive Profile.");
-		myAdapter.setStateAsync("Profiles.Active", { val: universalReturnValue, ack: true });
-		await sleep(sleepTime);
 
 		getSelectedProfile();
 		await sleep(sleepTime);
@@ -1551,11 +1549,10 @@ function getNumActiveProfiles(){
 		.then(function(response){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Aktive Profile = " + response.data.getPRN + " Stück");
-			universalReturnValue = response.data.getPRN;
+			myAdapter.setStateAsync("Profiles.ActiveProfiles", { val: response.data.getPRN, ack: true });
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
-			universalReturnValue = null;
 		});
 }
 
@@ -1566,11 +1563,9 @@ function getSelectedProfile(){
 			myAdapter.log.info(JSON.stringify(response.data));
 			myAdapter.log.info("Selected Profile = " + response.data.getPRF);
 			myAdapter.setStateAsync("Profiles.SelectedProfile", { val: String(response.data.getPRF), ack: true });
-			universalReturnValue = response.data.getPRF;
 		})
 		.catch(function(error){
 			myAdapter.log.error(error);
-			universalReturnValue = null;
 		});
 }
 
